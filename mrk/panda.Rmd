@@ -390,8 +390,7 @@ setnames(dtPanFeats, vtStrainHaploHash)
 # vtStrainHaploHash <- c("SGDref#0", "AFI#0", "S288C#0",
 #                        "XXX-h3", "stoca-zo", "DBVPG6765#0")
 
-### dev
-indS <- vtStrainHaplo[1] 
+### dev indS <- vtStrainHaplo[1] 
 indL <- 1
 lsImpg <- list()
 ### for each strain-haplotypes (hyphen-separated)
@@ -420,8 +419,6 @@ colnames(dtImpgAll) <- hdImpg
 ### add supplementary columns
 dtImpgAll[, c("Query_start", "Query_end") := lapply(.SD, as.numeric),
           .SDcols = c("Query_start", "Query_end")]
-### dev: riattiva la riga qui sotto se ci sono problemi
-# dtImpgAll[, Target_cls := SplitSubCol(dtImpgAll[, Target_clsfeat], 1, "+")]
 dtImpgAll[, Target_cls := SplitSubCol(Target_clsfeat, 1, ":")]
 dtImpgAll[, c("Target_start", "Target_end") := lapply(.SD, as.numeric),
           .SDcols = c("Target_start", "Target_end")]
@@ -474,8 +471,7 @@ for (indTarClsFeat in vtUnq) {
   
   ## block calculation --------------------------------------------------------
   
-  ### dev
-  print(nBlocks)
+  ### dev print(nBlocks)
   
   ### get the target class-features that will generate the block
   dtTarClsFeat <- dtImpgAllSzFlt[indTarClsFeat, on = "Target_clsfeat"]
