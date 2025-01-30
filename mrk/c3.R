@@ -335,7 +335,7 @@ for (indTarClsFeat in vtUnq) {
                                      dtSblockRed[, V3],
                                      sep = "#")]
     
-    ### retrieve and store the sequences with samtools
+    ### TODO: retrieve and store the sequences with samtools
     
     ### collapsing with ";" all the Haplo_id elements of a Haplo_id
     dtSblockRedCo <- dtSblockRed[, paste(Info_str, collapse = ";"),
@@ -381,5 +381,5 @@ pathOutPanFeat <- file.path(dirOut, "pan-features.txt")
 write.table(x = dtPanFeats, file = pathOutPanFeat, append = F, quote = F,
             sep = "\t", col.names = T, row.names = F, na = "MA")
 save(dtPanFeats, file = file.path(dirOut, "pan-features.RData"))
-### write dtPanSeqs
+### TODO: write dtPanSeqs
 
