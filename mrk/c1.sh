@@ -1,5 +1,12 @@
+## settings -------------------------------------------------------------------
+
+### with mitochondrial sequence in one haplotype?
+with_mito="FALSE"
+
 ### the gff files repository
 dir_anno="${HOME}/data/nano-assemblies-pansn-2024/annotations"
+
+## clmnt ----------------------------------------------------------------------
 
 ### folders
 dir_base=$(dirname "${PWD}")
@@ -10,7 +17,7 @@ mkdir -p "${dir_out}"
 ### the vector with the strain-haplotypes ids
 declare -a gff_ids
 file_ids="${dir_base}/ids/ids-ps.txt"
-while IFS= read -r one_line; do
+while IFS="\n" read -r one_line; do
     gff_ids+=("${one_line}")
 done < "${file_ids}"
 
@@ -21,7 +28,9 @@ for strainhaplo_id in "${gff_ids[@]}"; do
   mito_name="${strain_id}-mt-features.gff"
   path_mito_gff=$(find "${dir_anno}" -name "${mito_name}")
   gff_type=$(basename "${path_gff}" | cut -f 2 -d "-") # e.g. 0 or 1
-  if [[ -f "${path_mito_gff}" ]] && [[ "${asse_type}" != "2" ]]; then
+  if [[ "${with_mito}" == "TRUE" && \
+        -f "${path_mito_gff}" && \
+        "${asse_type}" != "2" ]]; then
     cat <(grep -v "^#" "${path_gff}") <(grep -v "^#" "${path_mito_gff}") \
     > "${dir_out}/${name_gff}"
   else

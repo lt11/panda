@@ -4,13 +4,13 @@ options(scipen = 999)
 options(stringsAsFactors = F)
 rm(list = ls())
 library(data.table)
-library(here)
+library(this.path)
 library(scriptName)
 
 ## settings -------------------------------------------------------------------
 
 ### fixed settings
-dirBase <- dirname(here())
+dirBase <- dirname(this.dir())
 dirAnnoGff <- file.path(dirBase, "anno", "gff")
 dirOut <- file.path(dirBase, "anno", "bed")
 unlink(dirOut, recursive = T)
@@ -19,57 +19,59 @@ idRef <- "SGDref"
 hdGff <- c("Chr_id", "Strain_id", "Feat_type", "S_coord",
            "E_coord", "S_val", "Strand_id", "Frame_id", "Attribute_str")
 vtClassSrt <- c("gene",
-                "pseudogene",
-                "intron",
-                "five_prime_UTR_intron",
-                "noncoding_exon",
-                "plus_1_translational_frameshift",
-                "blocked_reading_frame",
-                "external_transcribed_spacer_region",
-                "internal_transcribed_spacer_region",
-                "ARS",
-                "ARS_consensus_sequence",
-                "TY1",
-                "TY1/TY2_soloLTR",
-                "TY1_truncated",
-                "TY2",
-                "TY3_soloLTR",
-                "TY4_soloLTR",
-                "TSU4_soloLTR",
-                "TY4_truncated",
-                "TY5",
-                "TY5_soloLTR",
-                "LTR_retrotransposon",
-                "long_terminal_repeat",
-                "W_region",
-                "Z1_region",
-                "Z2_region",
-                "centromere",
-                "centromere_DNA_Element_I",
-                "centromere_DNA_Element_II",
-                "centromere_DNA_Element_III",
-                "matrix_attachment_site",
-                "X_element",
-                "X_element_partial",
-                "X_element_combinatorial_repeat",
-                "X_region",
-                "Y_prime_element",
-                "Y_region",
-                "recombination_enhancer",
-                "silent_mating_type_cassette_array",
-                "mating_type_region",
-                "tRNA",
-                "pseudogenic_transcript",
-                "ncRNA",
-                "ncRNA_gene",
-                "non_transcribed_region",
-                "rRNA",
-                "rRNA_gene",
-                "snRNA",
-                "snRNA_gene",
-                "snoRNA",
-                "snoRNA_gene",
-                "intein_encoding_region")
+                "pseudogene")
+# vtClassSrt <- c("gene",
+#                 "pseudogene",
+#                 "intron",
+#                 "five_prime_UTR_intron",
+#                 "noncoding_exon",
+#                 "plus_1_translational_frameshift",
+#                 "blocked_reading_frame",
+#                 "external_transcribed_spacer_region",
+#                 "internal_transcribed_spacer_region",
+#                 "ARS",
+#                 "ARS_consensus_sequence",
+#                 "TY1",
+#                 "TY1/TY2_soloLTR",
+#                 "TY1_truncated",
+#                 "TY2",
+#                 "TY3_soloLTR",
+#                 "TY4_soloLTR",
+#                 "TSU4_soloLTR",
+#                 "TY4_truncated",
+#                 "TY5",
+#                 "TY5_soloLTR",
+#                 "LTR_retrotransposon",
+#                 "long_terminal_repeat",
+#                 "W_region",
+#                 "Z1_region",
+#                 "Z2_region",
+#                 "centromere",
+#                 "centromere_DNA_Element_I",
+#                 "centromere_DNA_Element_II",
+#                 "centromere_DNA_Element_III",
+#                 "matrix_attachment_site",
+#                 "X_element",
+#                 "X_element_partial",
+#                 "X_element_combinatorial_repeat",
+#                 "X_region",
+#                 "Y_prime_element",
+#                 "Y_region",
+#                 "recombination_enhancer",
+#                 "silent_mating_type_cassette_array",
+#                 "mating_type_region",
+#                 "tRNA",
+#                 "pseudogenic_transcript",
+#                 "ncRNA",
+#                 "ncRNA_gene",
+#                 "non_transcribed_region",
+#                 "rRNA",
+#                 "rRNA_gene",
+#                 "snRNA",
+#                 "snRNA_gene",
+#                 "snoRNA",
+#                 "snoRNA_gene",
+#                 "intein_encoding_region")
 ### just in case there's some redundancy
 vtClassSrt <- unique(vtClassSrt)
 
@@ -82,7 +84,8 @@ cat("[", myName, "] ",
     "\n", sep = "")
 
 ### read strain-haplotypes ids from file
-pathIds <- file.path(dirBase, "ids", "ids-ps.txt")
+pathIds <- list.files(path = dirBase, pattern = "ids-ps.txt",
+                      full.names = T, recursive = T)
 vtStrainHaplo <- as.character(fread(file = pathIds, header = F)[[1]])
 vtRef <- grep(idRef, vtStrainHaplo, value = T)
 ### remove the reference

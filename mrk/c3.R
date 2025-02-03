@@ -4,7 +4,7 @@ options(scipen = 999)
 options(stringsAsFactors = F)
 rm(list = ls())
 library(data.table)
-library(here)
+library(this.path)
 library(scriptName)
 library(GenomicRanges)
 library(tictoc)
@@ -28,7 +28,7 @@ SplitSubCol <- function(x, n, s) {
 ## settings -------------------------------------------------------------------
 
 ### fixed settings
-dirBase <- dirname(here())
+dirBase <- dirname(this.dir())
 ### dev dirBase <- "/Users/Lorenzo/dev/panda"
 dirAnnoBed <- file.path(dirBase, "anno", "bed")
 dirOut <- file.path(dirBase, "png")
@@ -337,7 +337,7 @@ for (indTarClsFeat in vtUnq) {
     dtTra <- dtTra[-1]
     ### add class and features columns
     dtTra[, ':='(class = rep(indSb, .N), features = rep(strFeats, .N))]
-
+    
     ### add the missing columns: not needed 
     ### since rbindlist makes it by default using fill = TRUE
     # newCols <- setdiff(vtStrainHaploHash, colnames(dtTra))
@@ -360,7 +360,7 @@ for (indTarClsFeat in vtUnq) {
   dtImpgAllSzFlt <- dtImpgAllSzFlt[-indOut]
   
   nBlocks <- nBlocks + 1
-
+  
   ### dev if (nBlocks == 20) stop("We did 20 iterations!")
 }
 
@@ -377,4 +377,3 @@ write.table(x = dtPanFeats, file = pathOutPanFeat, append = F, quote = F,
             sep = "\t", col.names = T, row.names = F, na = "MA")
 save(dtPanFeats, file = file.path(dirOut, "pan-features.RData"))
 ### TODO: write dtPanSeqs
-
