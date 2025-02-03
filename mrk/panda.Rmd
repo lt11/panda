@@ -16,7 +16,7 @@ With impg 0.2.0 it is normal to get a warning message stating:
 
 `Target name not found in index`
 
-This is related to the behaviour of `wfmash` who, given to fastas A and B, does not align both A vs B and B vs A but instead only aligns A vs B.
+This is related to the behaviour of `wfmash` who, given to fasta files A and B, does not align both A vs B and B vs A but instead only aligns A vs B.
 
 ## TODO
 
@@ -36,7 +36,7 @@ Before running the markdown remember to:
 - check all chunks with `eval = FALSE`
 - make a copy of the input alignment in paf format ("/.../aln/graph-name.paf")
 - make the input ("/.../ids/ids-ps.txt") file with the ids (e.g. "SGDref-0", "AIF-1", "AIF-2") of the strains used to build the graph induced from the alignment
-- choose if mitochondrial features should be used (attached to the first available haplotype)
+- choose if mitochondrial features should be used (in case they are attached to the first available haplotype) with `with_mito`
 
 ## Analysis
 
