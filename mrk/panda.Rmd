@@ -379,7 +379,7 @@ if (length(pathAlnPaf) > 1) {
 ### script name
 myName <- current_filename()
 cat("[", myName, "] ",
-    "Making the pangenome ",
+    "Making the pangenome. ",
     "\n", sep = "")
 
 ### read strain-haplotypes ids from file (the order is maintained in the output)
