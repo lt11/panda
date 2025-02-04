@@ -132,11 +132,16 @@ for (indS in vtStrainHaplo) {
   
   ### pick the strain-haplotypes bed file (query)
   pathAnnoBed <- list.files(path = dirAnnoBed, pattern = indS, full.names = T)
-  ### string for bash
-  strBashImpg <- paste0("impg -I -p ", pathAlnPaf, " -b ", pathAnnoBed)
+  
   ### run "$ impg -p file.paf -b file.bed"  which is 
   ### (50x faster than going line-by-line)
   ### with direct load of the output
+  
+  ### string for bash (impg-0.2.0)
+  strBashImpg <- paste0("impg -I -p ", pathAlnPaf, " -b ", pathAnnoBed)
+  ### string for bash (impg-0.2.3)
+  ### strBashImpg <- paste0("impg query -I -p ", pathAlnPaf, " -b ", pathAnnoBed)
+  
   strOut <- system(strBashImpg, intern = T)
   ### make a single-file data-table
   lsImpgOne <- strsplit(strOut, split = "\t")
