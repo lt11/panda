@@ -369,9 +369,17 @@ dirAlnPaf <- file.path(dirBase, "aln")
 pathAlnPaf <- list.files(path = dirAlnPaf, pattern = "paf$",
                          recursive = T, full.names = T)
 if (length(pathAlnPaf) > 1) {
-  stop("Multiple paf files found.")
+  cat("[", myName, "] ",
+      "User error.\n",
+      sep = "")
+  ### stop prints "Error: " by default
+  stop("multiple paf files found.")
 } else if (length(pathAlnPaf) == 0) {
-  stop("No paf file found.")
+  cat("[", myName, "] ",
+      "User error.\n",
+      sep = "")
+  ### stop prints "Error: " by default
+  stop("no paf file found.")
 }
 
 ## clmnt ----------------------------------------------------------------------
