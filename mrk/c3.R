@@ -161,6 +161,7 @@ for (indS in vtStrainHaplo) {
                                 function(x) as.data.table(as.list(x))))
   ### append the single-file data-table to a list
   lsImpg[[indL]] <- dtImpgOne
+  print(format(object.size(lsImpg), units = "auto"))
   indL <- indL + 1
 }
 cat("[", myName, "] ",
@@ -199,13 +200,13 @@ strStrand <- SplitSubCol(dtImpgAllSzFlt[, Target_clsfeat], 2, "#")
 dtImpgAllSzFlt[, Query_id := paste0(Query_id, "#", strStrand)]
 dtImpgAllSzFlt[, Target_id := paste0(Target_id, "#", strStrand)]
 
-nBlocks <- 1
-vtUnq <- unique(dtImpgAllSzFlt[, Target_clsfeat])
+## blocks calculation ---------------------------------------------------------
 
 cat("[", myName, "] ",
     "Blocks calculation. ",
     "\n", sep = "")
-
+nBlocks <- 1
+vtUnq <- unique(dtImpgAllSzFlt[, Target_clsfeat])
 ### dev
 # indTarClsFeat <- "Y_prime_element:TEL06L#-"
 # indTarClsFeat <- "gene:YAR014C#-"
@@ -226,8 +227,6 @@ cat("[", myName, "] ",
 # indTarClsFeat <- unique(dtImpgAllSzFlt[, Target_clsfeat])[3]
 # indTarClsFeat <- vtUnq[1]
 for (indTarClsFeat in vtUnq) {
-  
-  ## block calculation --------------------------------------------------------
   
   ### dev print(nBlocks)
   
