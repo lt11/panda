@@ -402,6 +402,10 @@ setnames(dtPanFeats, vtStrainHaploHash)
 # vtStrainHaploHash <- c("SGDref#0", "AFI#0", "S288C#0",
 #                        "XXX-h3", "stoca-zo", "DBVPG6765#0")
 
+### message
+cat("[", myName, "] ",
+    "Running impg. ",
+    "\n", sep = "")
 ### dev indS <- vtStrainHaplo[1] 
 indL <- 1
 lsImpg <- list()
@@ -429,6 +433,9 @@ for (indS in vtStrainHaplo) {
   lsImpg[[indL]] <- dtImpgOne
   indL <- indL + 1
 }
+cat("[", myName, "] ",
+    "Running impg: done. ",
+    "\n", sep = "")
 
 ### get the redundant data-table
 dtImpgAll <- rbindlist(lsImpg)
@@ -464,6 +471,10 @@ dtImpgAllSzFlt[, Target_id := paste0(Target_id, "#", strStrand)]
 
 nBlocks <- 1
 vtUnq <- unique(dtImpgAllSzFlt[, Target_clsfeat])
+
+cat("[", myName, "] ",
+    "Blocks calculation. ",
+    "\n", sep = "")
 
 ### dev
 # indTarClsFeat <- "Y_prime_element:TEL06L#-"
@@ -646,6 +657,15 @@ for (indTarClsFeat in vtUnq) {
   
   ### dev if (nBlocks == 20) stop("We did 20 iterations!")
 }
+cat("[", myName, "] ",
+    "Blocks calculation left ",
+    nrow(dtImpgAllSzFlt),
+    " impg lines. "
+    "\n", sep = "")
+
+cat("[", myName, "] ",
+    "Blocks calculation: done. ",
+    "\n", sep = "")
 
 ### format and write dtPanFeats
 leftCols <- c("class", "features")
