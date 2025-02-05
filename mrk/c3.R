@@ -389,7 +389,7 @@ for (indTarClsFeat in vtUnq) {
 cat("[", myName, "] ",
     "Blocks calculation left ",
     nrow(dtImpgAllSzFlt),
-    " impg lines. "
+    " impg lines. ",
     "\n", sep = "")
 
 cat("[", myName, "] ",
