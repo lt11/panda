@@ -3,3 +3,6 @@ aln/
 anno/
 png/
 mrk/run-profvis.R
+.DS_Store
+mrk/.DS_Store
+mrk/.Rhistory
