@@ -215,12 +215,11 @@ for (indR in vtRef) {
          quote = F, row.names = F, col.names = F)
 }
 
+### dev
+### indS <- vtStrainHaplo[1]
+### indS <- "AKH_1a-0"
 ### loop for phenovar annotations
 for (indS in vtStrainHaplo) {
-  ### dev
-  # indS <- vtStrainHaplo[1] ### dev
-  # indS <- "AKH_1a-0" ### dev
-  
   ### read the gff
   pathAnnoGff <- list.files(path = dirAnnoGff, pattern = indS,
                             full.names = T, recursive = T)
