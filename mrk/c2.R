@@ -84,8 +84,8 @@ cat("[", myName, "] ",
     "\n", sep = "")
 
 ### read strain-haplotypes ids from file
-pathIds <- list.files(path = dirBase, pattern = "ids-ps.txt",
-                      full.names = T, recursive = T)
+pathIds <- list.files(path = file.path(dirBase, "ids"), pattern = "ids-ps.txt",
+                      full.names = T)
 vtStrainHaplo <- as.character(fread(file = pathIds, header = F)[[1]])
 vtRef <- grep(idRef, vtStrainHaplo, value = T)
 ### remove the reference
