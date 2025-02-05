@@ -344,16 +344,10 @@ for (indTarClsFeat in vtUnq) {
     dtSblockRed[, Info_str :=  paste(vtCoord,
                                      SplitSubCol(dtSblockRed[, V1], 4, "#"),
                                      sep = "#")]
-    
-    ### TODO: retrieve and store the sequences with samtools
-    
     ### collapsing with ";" all the Haplo_id elements of a Haplo_id
     dtSblockRedCo <- dtSblockRed[, paste(Info_str, collapse = ";"),
                                  by = Haplo_id]
-    
     ### transpose, producing a data-table
-    ### we keep it as data-table even if 
-    ### qui
     dtTra <- transpose(dtSblockRedCo)
     ### set column names and format
     setnames(dtTra, as.character(dtTra[1, ]))
@@ -401,11 +395,6 @@ leftCols <- c("class", "features")
 colOrder <- c(leftCols, setdiff(names(dtPanFeats), leftCols))
 setcolorder(dtPanFeats, colOrder)
 pathOutPanFeat <- file.path(dirOut, "pan-features.txt")
-# fwrite(dtPanFeats, file = pathOutPanFeat, append = F, quote = F, sep = "\t",
-#        col.names = T, na = "MA", nThread = 8, buffMB = 1024)
-#>Error in fwrite(dtPanFeats, file = pathOutPanFeat, append = F, quote = F,  : 
-#> Bad address: '/home/ltattini/prog/graphs/panda/run-11/png/pan-features.txt'
 write.table(x = dtPanFeats, file = pathOutPanFeat, append = F, quote = F,
             sep = "\t", col.names = T, row.names = F, na = "MA")
 save(dtPanFeats, file = file.path(dirOut, "pan-features.RData"))
-### TODO: write dtPanSeqs
