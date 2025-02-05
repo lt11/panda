@@ -153,6 +153,10 @@ for (indS in vtStrainHaplo) {
   strFeatIdTrm <- sub("^([^:]*).*$", "\\1", strFeatId)
   ### trim "tRNA_" from feature id
   strFeatIdTrm <- sub(pattern = "tRNA_", replacement = "", x = strFeatIdTrm)
+  ### indexes of the rows that do not contain
+  ### nuclear gene names with systematic names, e.g. YAL062W
+  indSys <- grep(pattern = "^Y[A-P][L,R][0-9]{3}[W,C]",
+                 x = strFeatIdTrm, value = F, invert = T)
   ### if strFeatId = dtGff[, Feat_type] set strFeatId = "MN"
   indM <- which(dtGff[, Feat_type] == strFeatIdTrm)
   if (length(indM) != 0) {
@@ -162,10 +166,11 @@ for (indS in vtStrainHaplo) {
   strName <- paste0(dtGff[, Feat_type], ":",
                     strFeatIdTrm, "#", dtGff[, Strand_id])
   ### transform the gff into a bed file
-  dtBed <- data.table(chrom = paste0(strIdPref, dtGff[, Chr_id]),
-                      chromStart = dtGff[, S_coord],
-                      chromEnd = dtGff[, E_coord],
-                      name = strName)
+  ### and filter out genes with a systematic name
+  dtBed <- data.table(chrom = paste0(strIdPref, dtGff[indSys, Chr_id]),
+                      chromStart = dtGff[indSys, S_coord],
+                      chromEnd = dtGff[indSys, E_coord],
+                      name = strName[indSys])
   ### write the bed file
   nameOut <- sub(pattern = "-features.gff$", replacement = ".bed",
                  x = basename(pathAnnoGff))
