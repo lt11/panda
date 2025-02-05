@@ -83,7 +83,7 @@ done
 
 ```
 
-Here we transform the annotation files in gff format to bed files (without header, otherwise impg crashes). The format of the annotations file for the reference genome are slightly different compared to the phenovar data. So we have to process them separately.
+Here we transform the annotation files in gff format to bed files (without header, otherwise impg crashes). The format of the annotations file for the reference genome are slightly different compared to the phenovar data. So we have to process them separately. Moreover, when we process the phenovar data we can filter out the genes with a systematic name since these names will be brought in by the reference annotations. This reduces the calculations needed from impg and thus results in a smaller impg output.
 
 ```{r transforms the gff files to bed files}
 ## header ---------------------------------------------------------------------
@@ -371,9 +371,9 @@ for (indS in vtStrainHaplo) {
   ### with direct load of the output
   
   ### string for bash (impg-0.2.0)
-  strBashImpg <- paste0("impg -I -p ", pathAlnPaf, " -b ", pathAnnoBed)
+  ### strBashImpg <- paste0("impg -I -p ", pathAlnPaf, " -b ", pathAnnoBed)
   ### string for bash (impg-0.2.3)
-  ### strBashImpg <- paste0("impg query -I -p ", pathAlnPaf, " -b ", pathAnnoBed)
+  strBashImpg <- paste0("impg query -I -p ", pathAlnPaf, " -b ", pathAnnoBed)
   
   strOut <- system(strBashImpg, intern = T)
   ### make a single-file data-table
