@@ -455,6 +455,11 @@ vtUnq <- unique(dtImpgAllSzFlt[, Target_clsfeat])
 # which(vtUnq == "X_element+TEL01L#+")
 # indTarClsFeat <- unique(dtImpgAllSzFlt[, Target_clsfeat])[3]
 # indTarClsFeat <- vtUnq[1]
+
+### YAL005C overlaps with YAL004W, we do not want these two genes
+### to generate a single sub-block, so we make the overlap strand-aware
+# indTarClsFeat <- "gene:YAL004W#+"
+# indTarClsFeat <- "gene:YAL005C#-"
 for (indTarClsFeat in vtUnq) {
   
   ### dev print(nBlocks)
@@ -481,14 +486,14 @@ for (indTarClsFeat in vtUnq) {
   dtIndOverOne <- foverlaps(dtImpgAllSzFlt, dtTarClsFeat,
                             nomatch = NULL, type = "any", which = T)
   dtBlock <- dtImpgAllSzFlt[dtIndOverOne[, xid], ]
-  print(format(object.size(dtBlock), units = "auto"))
+  ### dev print(format(object.size(dtBlock), units = "auto"))
   
   ### second round of overlap (on target coordinates)
   setkey(dtBlock, Target_id, Target_start, Target_end)
   dtIndOverTwo <- foverlaps(dtImpgAllSzFlt, dtBlock, 
                             nomatch = NULL, type = "any", which = T)
   dtBlock <- rbindlist(list(dtBlock, dtImpgAllSzFlt[dtIndOverTwo[, xid], ]))
-  print(format(object.size(dtBlock), units = "auto"))
+  ### dev print(format(object.size(dtBlock), units = "auto"))
   
   ### block classes
   allClassesInBlock <- unique(dtBlock[, Target_cls])
