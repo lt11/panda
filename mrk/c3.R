@@ -79,6 +79,8 @@ setnames(dtPanFeats, vtStrainHaploHash)
 # vtStrainHaploHash <- c("SGDref#0", "AFI#0", "S288C#0",
 #                        "XXX-h3", "stoca-zo", "DBVPG6765#0")
 
+## impg run -------------------------------------------------------------------
+
 ### message
 cat("[", myName, "] ",
     "Running impg. ",
