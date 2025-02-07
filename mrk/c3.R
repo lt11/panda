@@ -275,6 +275,7 @@ for (indTarClsFeat in vtUnq) {
     # vtHaplo <- sub("#chr.*", "", dtSblockRed[, V1])
     # tbHaplo <- table(vtHaplo)
     # if (length(which(tbHaplo > 1)) != 0) {
+    #   ### stop prints "Error: " by default
     #   stop("found it!")
     # }
     
@@ -336,7 +337,8 @@ for (indTarClsFeat in vtUnq) {
   
   nBlocks <- nBlocks + 1
   
-  ### dev if (nBlocks == 20) stop("We did 20 iterations!")
+  ### stop prints "Error: " by default
+  ### dev if (nBlocks == 20) stop("we did 20 iterations!")
 }
 cat("[", myName, "] ",
     "Blocks calculation left ",
