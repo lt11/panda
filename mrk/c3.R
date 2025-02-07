@@ -131,6 +131,10 @@ dtImpgAll[, Target_len := Target_end - Target_start]
 ### size filters
 dtImpgAllSzFlt <- dtImpgAll[Target_len > 5 & Query_end - Query_start > 5]
 
+### garbage collection
+rm(dtImpgAll)
+invisible(gc())
+
 ### sorting ascending or descending is not equivalent since the 
 ### overlap is done in two rounds and 
 ### is strand-aware (if two features have overlapping 
