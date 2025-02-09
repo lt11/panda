@@ -20,7 +20,7 @@ This is related to the behaviour of `wfmash` who, given to fasta files A and B, 
 
 ## TODO
 
-Retrieve the sequences of each block and save them? Probably this is not a wise thing to do. With the nnew output format it is easy to do this on the fly.
+Retrieve the sequences of each block and save them? Probably this is not a wise thing to do. With the new output format it is easy to do this on the fly.
 
 ## Input Files and Formats
 
@@ -37,6 +37,7 @@ Before running the markdown remember to:
 - make a copy of the input alignment in paf format ("/.../aln/graph-name.paf")
 - make the input ("/.../ids/ids-ps.txt") file with the ids (e.g. "SGDref-0", "AIF-1", "AIF-2") of the strains used to build the graph induced from the alignment
 - choose if mitochondrial features should be used (in case they are attached to the first available haplotype) with `with_mito`
+- choose the correct line according to the version of impg installed
 
 ## Analysis
 
