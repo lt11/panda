@@ -148,7 +148,8 @@ invisible(gc())
 ### example of a spurious overlap
 setorder(dtImpgAllSzFlt, Target_len)
 
-### transfer the strand data from Target_clsfeat to Query_id and Target_id
+### transfer the strand data from Target_clsfeat to Query_id and Target_id,
+### so that when we calculate the blocks these will be strand-aware
 strStrand <- SplitSubCol(dtImpgAllSzFlt[, Target_clsfeat], 2, "#")
 dtImpgAllSzFlt[, Query_id := paste0(Query_id, "#", strStrand)]
 dtImpgAllSzFlt[, Target_id := paste0(Target_id, "#", strStrand)]
