@@ -274,14 +274,6 @@ for (indTarClsFeat in vtUnq) {
     ###                   <char>                      <char>
     ### chrVII:1084864-1090591#+    chrVII:1085116-1090843#+
     
-    ### dev
-    # vtHaplo <- sub("#chr.*", "", dtSblockRed[, V1])
-    # tbHaplo <- table(vtHaplo)
-    # if (length(which(tbHaplo > 1)) != 0) {
-    #   ### stop prints "Error: " by default
-    #   stop("found it!")
-    # }
-    
     ### transposition and collapsing explained with
     ### another example, this dtSblockRed:
     ###                      V1            V2
