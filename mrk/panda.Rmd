@@ -433,6 +433,7 @@ setorder(dtImpgAllSzFlt, Target_len)
 strStrand <- SplitSubCol(dtImpgAllSzFlt[, Target_clsfeat], 2, "#")
 dtImpgAllSzFlt[, Query_id := paste0(Query_id, "#", strStrand)]
 dtImpgAllSzFlt[, Target_id := paste0(Target_id, "#", strStrand)]
+nImpgAllSzFlt <- nrow(dtImpgAllSzFlt)
 
 ## blocks calculation ---------------------------------------------------------
 
@@ -623,7 +624,8 @@ for (indTarClsFeat in vtUnq) {
 cat("[", myName, "] ",
     "Blocks calculation left ",
     nrow(dtImpgAllSzFlt),
-    " impg lines. ",
+    " impg lines out of ",
+    nImpgAllSzFlt, ".",
     "\n", sep = "")
 
 cat("[", myName, "] ",
