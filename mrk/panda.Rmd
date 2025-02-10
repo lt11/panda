@@ -392,7 +392,7 @@ for (indS in vtStrainHaplo) {
   sizeList <- format(object.size(lsImpg), units = "auto")
   cat("[", myName, "] ",
       "Size of impg's list: ", sizeList, " at iteration: ",
-      indL, " out of ", length(vtStrainHaplo), 
+      indL, " out of ", length(vtStrainHaplo), ".",
       "\n", sep = "")
   indL <- indL + 1
 }
