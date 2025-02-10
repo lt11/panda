@@ -37,7 +37,7 @@ dirOut <- file.path(dirBase, "png")
 unlink(dirOut, recursive = T)
 dir.create(dirOut, showWarnings = F)
 pathGen <- file.path(dirOut, "generators.txt")
-cat("class:feature", "\n", file = pathGen)
+cat("class:feature#strand", "\n", file = pathGen)
 idRef <- "SGDref"
 hdImpg <- c("Query_id", "Query_start", "Query_end",
             "Target_id", "Target_start", "Target_end",
@@ -288,16 +288,14 @@ for (indTarClsFeat in vtUnq) {
     ###
     ### must produce this column:
     ### DBVPG6765#0
-    ### chrIV:960288-966619#-,chrXIII:354903-355179#-
+    ### chrIV:960288-966619;chrXIII:354903-355179
     
     ### formatting dtSblockRed
     dtSblockRed[, Haplo_id := sub("#chr.*", "", dtSblockRed[, V1])]
-    vtCoord <- paste(SplitSubCol(x = dtSblockRed[, V1], n = 3, s = "#"),
-                     dtSblockRed[, V2],
-                     sep = ":")
-    dtSblockRed[, Info_str :=  paste(vtCoord,
-                                     SplitSubCol(dtSblockRed[, V1], 4, "#"),
-                                     sep = "#")]
+    dtSblockRed[, Info_str := paste(SplitSubCol(x = dtSblockRed[, V1],
+                                                n = 3, s = "#"),
+                                    dtSblockRed[, V2],
+                                    sep = ":")]
     ### collapsing with ";" all the Haplo_id elements of a Haplo_id
     dtSblockRedCo <- dtSblockRed[, paste(Info_str, collapse = ";"),
                                  by = Haplo_id]
