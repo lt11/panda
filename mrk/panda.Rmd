@@ -304,6 +304,8 @@ SplitSubCol <- function(x, n, s) {
 
 ## settings -------------------------------------------------------------------
 
+### size threshold: smaller overlaps are removed
+sizeLim <- 5
 ### fixed settings
 dirBase <- dirname(this.dir())
 ### dev dirBase <- "/Users/Lorenzo/dev/panda"
@@ -406,7 +408,8 @@ dtImpgAll[, c("Target_start", "Target_end") := lapply(.SD, as.numeric),
 dtImpgAll[, Target_len := Target_end - Target_start]
 
 ### size filters
-dtImpgAllSzFlt <- dtImpgAll[Target_len > 5 & Query_end - Query_start > 5]
+dtImpgAllSzFlt <- dtImpgAll[Target_len > sizeLim
+                            & Query_end - Query_start > sizeLim]
 
 ### garbage collection
 rm(dtImpgAll)
@@ -441,7 +444,6 @@ vtUnq <- unique(dtImpgAllSzFlt[, Target_clsfeat])
 ### dev
 # indTarClsFeat <- "Y_prime_element:TEL06L#-"
 # indTarClsFeat <- "gene:YAR014C#-"
-# indTarClsFeat <- vtUnq[1]
 # indTarClsFeat <- "gene:YBL037W#+"
 # indTarClsFeat <- "X_element:TEL01L#-"
 # indTarClsFeat <- "gene:YBR140C#-"
