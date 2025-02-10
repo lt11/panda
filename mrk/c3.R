@@ -112,11 +112,15 @@ for (indS in vtStrainHaplo) {
                                 function(x) as.data.table(as.list(x))))
   ### append the single-file data-table to a list
   lsImpg[[indL]] <- dtImpgOne
-  print(format(object.size(lsImpg), units = "auto"))
+  sizeList <- format(object.size(lsImpg), units = "auto")
+  cat("[", myName, "] ",
+      "Size of impg's list: ", sizeList, " at iteration: ",
+      indL, " out of ", length(vtStrainHaplo), 
+      "\n", sep = "")
   indL <- indL + 1
 }
 cat("[", myName, "] ",
-    "Running impg: done. ",
+    "Running impg: done.",
     "\n", sep = "")
 
 ### get the redundant data-table
@@ -130,13 +134,27 @@ dtImpgAll[, c("Target_start", "Target_end") := lapply(.SD, as.numeric),
           .SDcols = c("Target_start", "Target_end")]
 dtImpgAll[, Target_len := Target_end - Target_start]
 
-### size filters
+## overlap size filter --------------------------------------------------------
+
+### size filter
 dtImpgAllSzFlt <- dtImpgAll[Target_len > sizeLim
                             & Query_end - Query_start > sizeLim]
+cat("[", myName, "] ",
+    "Overlap size filter. ",
+    "\n", sep = "")
+nDtImpgAll <- nrow(dtImpgAll)
+nDtImpgAllSzFlt <- nrow(dtImpgAllSzFlt)
+nSmall <- nDtImpgAll - nDtImpgAllSzFlt
+cat("[", myName, "] ",
+    "Removing ", nSmall,
+    " entries out of ", nDtImpgAll, ".",
+    "\n", sep = "")
 
 ### garbage collection
 rm(dtImpgAll)
 invisible(gc())
+
+## sorting and formatting -----------------------------------------------------
 
 ### sorting ascending or descending is not equivalent since the 
 ### overlap is done in two rounds and 
