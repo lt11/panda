@@ -639,7 +639,7 @@ cat("[", myName, "] ",
     "\n", sep = "")
 
 ### format and write dtPanFeats
-leftCols <- c("class", "features")
+leftCols <- c("Class_id", "Features_id")
 colOrder <- c(leftCols, setdiff(names(dtPanFeats), leftCols))
 setcolorder(dtPanFeats, colOrder)
 pathOutPanFeat <- file.path(dirOut, "pan-features.txt")
