@@ -322,8 +322,8 @@ for (indTarClsFeat in vtUnq) {
     ### set column names and format
     setnames(dtTra, as.character(dtTra[1, ]))
     dtTra <- dtTra[-1]
-    ### add class and features columns
-    dtTra[, ':='(class = rep(indSb, .N), features = rep(strFeats, .N))]
+    ### add Class_id and Features_id columns
+    dtTra[, ':='(Class_id = rep(indSb, .N), Features_id = rep(strFeats, .N))]
     
     ### add the missing columns: not needed 
     ### since rbindlist makes it by default using fill = TRUE
