@@ -276,7 +276,6 @@ We write also the generators, i.e. the "class:feature" (e.g. "gene:YGL259W#+") t
 
 ```{r computes the pangenome}
 ## header ---------------------------------------------------------------------
-## header ---------------------------------------------------------------------
 
 options(scipen = 999)
 options(stringsAsFactors = F)
