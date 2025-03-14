@@ -2,9 +2,9 @@
 title: 'panda: pangenome annotations data analysis'
 author: "Lorenzo Tattini"
 date: "`r Sys.Date()`"
-### html documents may cause problems (knit fails) on Hulk
-### while pdf documents may casue problems (latex fails to compile the tex file
-### of the markdown) on macOS
+### html documents may cause problems on Hulk (knit fails)
+### while pdf documents may casue problems on macOS 
+### (latex fails to compile the tex file of the markdown) 
 output: pdf_document
 ---
 
