@@ -24,7 +24,7 @@ Retrieve the sequences of each block and save them? Probably this is not a wise 
 
 ## Input Files and Formats
 
-The input files are: 1) an alignment, 2) the annotations of the contigs aligned, 3) a properly (priority) sorted list of ids.
+The input files are: 1) an alignment, 2) the annotations (with unique identifiers) of the contigs aligned.
 
 The alignment file is in paf format. The delimiter (see https://github.com/pangenome/PanSN-spec) is "#". The annotations are in gff format. The file are named using the "-" separator. E.g. in the alignment we may have in line 1 and column 1: "SGDref#0#chrI". The corresponding annotations file is named "SGDref-0-features.gff" and it reports all the annotations for all the corresponding contigs.
 
