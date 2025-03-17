@@ -107,7 +107,8 @@ dir.create(dirOut, showWarnings = F)
 prefRef <- "SGDref"
 hdGff <- c("Chr_id", "Strain_id", "Feat_type", "S_coord",
            "E_coord", "S_val", "Strand_id", "Frame_id", "Attribute_str")
-vtClassSrt <- c("gene")
+vtClassSrt <- c("gene",
+                "pseudogene")
 # vtClassSrt <- c("gene",
 #                 "pseudogene",
 #                 "intron",
@@ -201,7 +202,10 @@ for (indR in vtRef) {
   ### if strFeatId = dtGff[, Feat_type] set strFeatId = "MN"
   indM <- which(dtGff[, Feat_type] == strFeatIdTrm)
   if (length(indM) != 0) {
-    strFeatIdTrm[indM] <- "MN"
+    strFeatIdTrm[indM] <- paste0(dtGff[indM, Strain_id], "_",
+                                 dtGff[indM, Chr_id], ":",
+                                 dtGff[indM, S_coord], "-",
+                                 dtGff[indM, E_coord])
   }
   ### paste class and feature id (and the strand)
   strName <- paste0(dtGff[, Feat_type], ":",
@@ -248,7 +252,10 @@ for (indS in vtStrainHaplo) {
   ### if strFeatId = dtGff[, Feat_type] set strFeatId = "MN"
   indM <- which(dtGff[, Feat_type] == strFeatIdTrm)
   if (length(indM) != 0) {
-    strFeatIdTrm[indM] <- "MN"
+    strFeatIdTrm[indM] <- paste0(dtGff[indM, Strain_id], "_",
+                                 dtGff[indM, Chr_id], ":",
+                                 dtGff[indM, S_coord], "-",
+                                 dtGff[indM, E_coord])
   }
   ### paste class and feature id (and the strand)
   strName <- paste0(dtGff[, Feat_type], ":",
