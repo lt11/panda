@@ -107,8 +107,7 @@ dir.create(dirOut, showWarnings = F)
 prefRef <- "SGDref"
 hdGff <- c("Chr_id", "Strain_id", "Feat_type", "S_coord",
            "E_coord", "S_val", "Strand_id", "Frame_id", "Attribute_str")
-vtClassSrt <- c("gene",
-                "pseudogene")
+vtClassSrt <- c("gene")
 # vtClassSrt <- c("gene",
 #                 "pseudogene",
 #                 "intron",
