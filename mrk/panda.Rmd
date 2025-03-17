@@ -502,7 +502,7 @@ for (indTarClsFeat in vtUnq) {
   
   ### dev print(nBlocks)
   
-  ### get the target class-features that will generate the block
+  ### get the target class-feature that will generate the block
   dtTarClsFeat <- dtImpgAllSzFlt[indTarClsFeat, on = "Target_clsfeat"]
   ### check if the corresponding interval is still in dtImpgAllSzFlt
   ### (if it was ovelapping with a former indTarClsFeat
