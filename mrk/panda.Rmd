@@ -320,7 +320,7 @@ SplitSubCol <- function(x, n, s) {
 
 ## settings -------------------------------------------------------------------
 
-### size threshold: smaller overlaps are removed
+### size threshold: smaller overlaps (in bp) are removed
 sizeLim <- 5
 ### fixed settings
 dirBase <- dirname(this.dir())
