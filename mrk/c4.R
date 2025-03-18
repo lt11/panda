@@ -218,39 +218,52 @@ dtPanFeatsGns[, Ν_pres := rowSums(!is.na(as.matrix(.SD))),
 ### fraction of strains with at least one region in the sub-block
 dtPanFeatsGns[, F_pres := c(Ν_pres / nHaplos) ]
 
-## core and accessory sub-blocks statistics -----------------------------------
+## core and dispensable sub-blocks statistics (haplotype-based) ---------------
 
-### all
+### all core
 cat("[", myName, "] ",
-    "Number of all-strains core genes: ", dtPanFeatsGns[, sum(F_pres == 1)],
+    "Number of all-strains core genes: ",
+    dtPanFeatsGns[, sum(F_pres == 1)],
     "\n", sep = "")
-### all but one
+### all but one core
 cat("[", myName, "] ",
-    "Number of N-1 core genes: ", dtPanFeatsGns[, sum(Ν_pres >= c(nHaplos - 1))],
+    "Number of N-1 core genes: ",
+    dtPanFeatsGns[, sum(Ν_pres >= c(nHaplos - 1))],
     "\n", sep = "")
-### all but two
+### all but two core
 cat("[", myName, "] ",
-    "Number of N-2 core genes: ", dtPanFeatsGns[, sum(Ν_pres >= c(nHaplos - 2))],
+    "Number of N-2 core genes: ",
+    dtPanFeatsGns[, sum(Ν_pres >= c(nHaplos - 2))],
+    "\n", sep = "")
+### strictly dispensable: 1 ≤ N presence < all
+cat("[", myName, "] ",
+    "Number of strictly dispensable: ",
+    dtPanFeatsGns[, sum(Ν_pres < nHaplos)],
+    "\n", sep = "")
+### moderately dispensable: 1 < N presence < all
+cat("[", myName, "] ",
+    "Number of strictly dispensable: ",
+    dtPanFeatsGns[, sum(Ν_pres < nHaplos
+                        & 1 < Ν_pres)],
+    "\n", sep = "")
+### 1-leniently dispensable: 1 < N presence < all - 1
+cat("[", myName, "] ",
+    "Number of 1-leniently dispensable: ",
+    dtPanFeatsGns[, sum(Ν_pres < c(nHaplos - 1)
+                        & 1 < Ν_pres)],
+    "\n", sep = "")
+### 2-leniently dispensable: 1 < N presence < all - 2
+cat("[", myName, "] ",
+    "Number of 1-leniently dispensable: ",
+    dtPanFeatsGns[, sum(Ν_pres < c(nHaplos - 2)
+                        & 1 < Ν_pres)],
     "\n", sep = "")
 ### private
 cat("[", myName, "] ",
-    "Number of private core genes: ", dtPanFeatsGns[, sum(Ν_pres == 1)],
+    "Number of private genes: ", dtPanFeatsGns[, sum(Ν_pres == 1)],
     "\n", sep = "")
 
-# the numbers of panda: pangenome annotations data analysis
-# we have 6579 systematic genes in SGD
-# the gene pangenome (107 haplotypes) has 9433 entries
-# an entry is an homology sub-block aka a unique gene
-# ("gene" for short in the next lines)
-# 5549 entries have at least one systematic name
-# (some of the 6589 SGD genes are overlapping or copies at different loci,
-# that in the panda output are reported in the same sub-block)
-# among these 5549 entries with a systematic name,
-# 1178 have at least one unlabelled gene (so it can get a systematic name)
-# 3884 genes do not have a systematic label
-# 
-# 1625 genes are private
-# 4470 are core (for N-2 haplotypes)
+
 
 ## sub-blocks decomposition ---------------------------------------------------
 
