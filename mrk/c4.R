@@ -150,6 +150,8 @@ idRefHap <- "SGDref-0"
 ptnSys <- "Y[A-P][L,R][0-9]{3}[W,C]"
 ### pattern of random id genes
 ptnRid <- "_G[0-9]{7}"
+### the type of sub-blocks to process
+strSblock <- "gene"
 
 ### fixed settings
 dirBase <- dirname(this.dir())
@@ -166,7 +168,7 @@ pathCountSblocsRegs <- file.path(dirOut, "n-sblocs-regs.txt")
 ### script name
 myName <- current_filename()
 cat("[", myName, "] ",
-    "Making the genes statistics. ",
+    "Making the sub-blocks statistics. ",
     "\n", sep = "")
 
 ### load SGDref features
@@ -186,35 +188,52 @@ dtBedRefGns <- dtBedRef[grep("^gene", Class_feat_strand)]
 ### load the pangenome (dtPanFeats)
 pathInPan <- file.path(dirBase, "png", "pan-features.RData")
 load(pathInPan)
-# setnames(dtPanFeats, old = names(dtPanFeats)[1:2],
-#          new = c("Class_id", "Features_id"))
+### dev dtPanFeats <- dtPanFeats[1:20, 1:10, with = F]
 
-### strain column boundaries
+### we need the first and last haplotype columns to correctly subset 
+### the data-table when we calculate the statistics 
 nHaplos <- ncol(dtPanFeats) - 2
 nSkip <- 2
-firstStrainCol <- 1 + nSkip
-lastStrainCol <- ncol(dtPanFeats)
+firstHaploCol <- 1 + nSkip
+lastHaploCol <- ncol(dtPanFeats)
 
-### sub-blocks statistics
-dtPanFeatsGns <- dtPanFeats[Class_id == "gene"]
+## sub-blocks statistics ------------------------------------------------------
+
+dtPanFeatsGns <- dtPanFeats[Class_id == strSblock]
+cat("[", myName, "] ",
+    "Counting on sub-blocks labelled as: ",
+    strSblock,
+    "\n", sep = "")
+### dev dtPanFeatsGns[20, 4:10] <- NA
+
+nSBlocks <- nrow(dtPanFeatsGns)
+cat("[", myName, "] ",
+    "Number of sub-blocks: ",
+    nSBlocks,
+    "\n", sep = "")
+
 nSys <- nrow(dtPanFeatsGns[grep(ptnSys, Features_id)])
-nUnl <- nrow(dtPanFeatsGns[grep(ptnSys, Features_id, invert = T)])
+cat("[", myName, "] ",
+    "Number of sub-blocks with systematic label(s): ",
+    nSys,
+    "\n", sep = "")
 
-### sub-blocks with at least one labellable gene
+nUnl <- nrow(dtPanFeatsGns[grep(ptnSys, Features_id, invert = T)])
+cat("[", myName, "] ",
+    "Number of sub-blocks with random label(s): ",
+    nUnl,
+    "\n", sep = "")
+
 nLabellable <- nrow(dtPanFeatsGns[grepl(ptnSys, Features_id)
                                   & grepl(ptnRid, Features_id)])
-
-### fraction of presence: how many strains have
-### at least on path though a sub-block
-# dtPanFeatsGns[, Ν_notna := Reduce(`+`, lapply(.SD, Negate(is.na))),
-#               .SDcols = 3:nHaplos]
-
-# cucco <- dtPanFeatsGns[5, as.character(unlist(.SD)), .SDcols = 3:109]
-# sum(!is.na(cucco))
+cat("[", myName, "] ",
+    "Number of sub-blocks with at least one labellable gene: ",
+    nLabellable,
+    "\n", sep = "")
 
 ### number of strains with at least one region in the sub-block
 dtPanFeatsGns[, Ν_pres := rowSums(!is.na(as.matrix(.SD))),
-              .SDcols = firstStrainCol:lastStrainCol]
+              .SDcols = firstHaploCol:lastHaploCol]
 ### fraction of strains with at least one region in the sub-block
 dtPanFeatsGns[, F_pres := c(Ν_pres / nHaplos) ]
 
@@ -263,14 +282,12 @@ cat("[", myName, "] ",
     "Number of private genes: ", dtPanFeatsGns[, sum(Ν_pres == 1)],
     "\n", sep = "")
 
-
-
-## sub-blocks decomposition ---------------------------------------------------
+## decomposition of the features in each sub-block ----------------------------
 
 ### count how many features are present in a sub-block with gregexpr
 ### and using integers only (e.g. 1L), although it does not work with empty 
 ### strings (but this cannot happen in dtPanFeatsGns[, Features_id])
-### gregexpr(",", c("dst", "Sto,ca"))
+### gregexpr(",", c("dst", "Sto,ca", "", NA))
 ### [[1]]
 ### [1] -1
 ### attr(,"match.length")
@@ -310,19 +327,19 @@ if (nTrue != nrow(dtPanFeatsGns)) {
   stop("features patterns probably did not work.")
 }
 
-## count sub-blocks and regions per strain ------------------------------------
+## count sub-blocks and regions per haplotype ---------------------------------
 
 dtSb <- dtPanFeatsGns[, lapply(.SD, CountNoNa), 
-                      .SDcols = firstStrainCol:lastStrainCol]
+                      .SDcols = firstHaploCol:lastHaploCol]
 
 dtRe <- dtPanFeatsGns[, lapply(.SD, CountSemicSep),
-                      .SDcols = firstStrainCol:lastStrainCol]
+                      .SDcols = firstHaploCol:lastHaploCol]
 
 dtN <- rbindlist(list(dtSb, dtRe))
 dtT <- transpose(dtN)
 dtCounts <- data.table(colnames(dtN),
                        dtT)
-colnames(dtCounts) <- c("Id_strain", "N_sblocks", "N_regions")
+colnames(dtCounts) <- c("Haplo_id", "N_sblocks", "N_regions")
 
 ### save dtT with counts
 fwrite(file = pathCountSblocsRegs, x = dtCounts, sep = "\t",
