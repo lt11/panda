@@ -727,7 +727,8 @@ CountSemicSep <- function(x) {
 #' Count Features in a Comma-Separated String
 #'
 #' This function counts the number of features in a character vector where 
-#' values are separated by commas (`,`). If a value does not contain any commas, 
+#' values are separated by commas (`,`).
+#' If a value does not contain any commas, 
 #' it is assumed to be a single feature. 
 #' The function correctly handles `NA` values.
 #'
@@ -849,7 +850,8 @@ cat("[", myName, "] ",
 ### load SGDref features
 pathBedRef <- file.path(dirBase, "anno", "bed", paste0(idRefHap, ".bed"))
 dtBedRef <- fread(file = pathBedRef, sep = "\t", header = F)
-names(dtBedRef) <- c("Strain_hap_chr", "S_coord", "E_coord", "Class_feat_strand")
+names(dtBedRef) <- c("Strain_hap_chr", "S_coord",
+                     "E_coord", "Class_feat_strand")
 dtBedRefGns <- dtBedRef[grep("^gene", Class_feat_strand)]
 
 # ### load the generators
@@ -902,21 +904,21 @@ cat("[", myName, "] ",
 nLabellable <- nrow(dtPanFeatsGns[grepl(ptnSys, Features_id)
                                   & grepl(ptnRid, Features_id)])
 cat("[", myName, "] ",
-    "Number of sub-blocks with at least one labellable gene: ",
+    "Number of sub-blocks with at least one labellable feature: ",
     nLabellable,
     "\n", sep = "")
 
-### number of strains with at least one region in the sub-block
+### number of haplotypes with at least one region in the sub-block
 dtPanFeatsGns[, Ν_pres := rowSums(!is.na(as.matrix(.SD))),
               .SDcols = firstHaploCol:lastHaploCol]
-### fraction of strains with at least one region in the sub-block
+### fraction of haplotypes with at least one region in the sub-block
 dtPanFeatsGns[, F_pres := c(Ν_pres / nHaplos) ]
 
 ## core and dispensable sub-blocks statistics (haplotype-based) ---------------
 
 ### all core
 cat("[", myName, "] ",
-    "Number of all-strains core genes: ",
+    "Number of all-haplotypes core genes: ",
     dtPanFeatsGns[, sum(F_pres == 1)],
     "\n", sep = "")
 ### all but one core
