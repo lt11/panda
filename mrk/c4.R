@@ -162,7 +162,8 @@ dirOut <- file.path(dirBase, "sts")
 unlink(dirOut, recursive = T)
 dir.create(dirOut, recursive = T)
 pathPanGenes <- file.path(dirOut, "sts-genes.txt")
-pathCountSblocsRegs <- file.path(dirOut, "n-sblocs-regs.txt")
+pathNorefPriv <- file.path(dirOut, "n-noref-priv.txt")
+pathCountSblocsRegs <- file.path(dirOut, "n-sblocks-regs.txt")
 
 ## clmnt ----------------------------------------------------------------------
 
@@ -289,24 +290,6 @@ cat("[", myName, "] ",
 ### count how many features are present in a sub-block with gregexpr
 ### and using integers only (e.g. 1L), although it does not work with empty 
 ### strings (but this cannot happen in dtPanFeatsGns[, Features_id])
-### gregexpr(",", c("dst", "Sto,ca", "", NA))
-### [[1]]
-### [1] -1
-### attr(,"match.length")
-### [1] -1
-### attr(,"index.type")
-### [1] "chars"
-### attr(,"useBytes")
-### [1] TRUE
-### [[2]]
-### [1] 4
-### attr(,"match.length")
-### [1] 1
-### attr(,"index.type")
-### [1] "chars"
-### attr(,"useBytes")
-### [1] TRUE
-
 dtPanFeatsGns[, N_feats := CountAnyFeat(Features_id)]
 dtPanFeatsGns[, N_feats_sys := CountSysFeat(Features_id)]
 dtPanFeatsGns[, N_feats_rid := CountRidFeat(Features_id)]
@@ -314,6 +297,13 @@ dtPanFeatsGns[, N_feats_rid := CountRidFeat(Features_id)]
 ### save dtPanFeatsGns with counts
 fwrite(file = pathPanGenes, x = dtPanFeatsGns, sep = "\t",
        row.names = F, col.names = T)
+
+### number of non-reference private features per haplotype
+tbNorefPriv <- table(dtPanFeatsGns[Ν_pres == 1 & N_feats_rid == 1,
+                              sub("_(?!.*_).*", "", Features_id, perl = T)])
+### save
+write.table(tbNorefPriv, file = pathNorefPriv, quote = F, sep = "\t",
+            row.names = F, col.names = c("Haplo_id", "N_priv"))
 
 ### check if N_feats[i] = N_feats_sys[i] + N_feats_rid[i]
 dtPanFeatsGns[, Good_sum := ifelse(N_feats_sys + N_feats_rid == N_feats,
