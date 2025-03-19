@@ -143,6 +143,52 @@ CountRidFeat <- function(x) {
   return(y)
 }
 
+#' Prepend Column Names to Substrings in Selected Columns of a data.table
+#'
+#' This function modifies a `data.table` by prepending each value 
+#' in the specified columns 
+#' with the corresponding column name followed by `#`. 
+#' Substrings within a column are assumed 
+#' to be separated by semicolons (`;`). `NA` values remain unchanged.
+#'
+#' @param x A `data.table` containing the dataset to be modified.
+#' @param y A numeric vector of column indices specifying 
+#' which columns should be modified.
+#'
+#' @return The input `data.table` is modified in-place, 
+#' with the selected columns updated 
+#' to have their column names prefixed to each substring.
+#'
+#' @examples
+#' library(data.table)
+#' 
+#' # create example data.table
+#' dt <- data.table(ID = 1:3,
+#'                  SGD#0 = c("chrIV:30-32", "chrXIV:386-541;chrXIV:260-415", NA),
+#'                  AAB#1 = c("", "chrV:35-80", "chrXII:99-111"))
+#' 
+#' # define columns to modify 
+#' (assuming SGD#0 is in column 2 and AAB#1 in column 3)
+#' modCols <- c(2, 3)
+#'
+#' # apply the function
+#' addColPref(dt, modCols)
+#'
+#' # expected output:
+#' #     ID   SGD#0                                        AAB#1
+#' # 1:  1    SGD#0#chrIV:30-32                            ""  (unchanged)
+#' # 2:  2    SGD#0#chrXIV:386-541;SGD#0chrXIV:260-415     AAB#1#chrV:35-80
+#' # 3:  3    NA (unchanged)                               AAB#1#chrXII:99-111
+#'
+#' @export
+addColPref <- function(x, y) {
+  x[, (y) := lapply(y, function(indC) {
+    col_name <- names(x)[indC]
+    ifelse(!is.na(x[[indC]]),
+           gsub("([^;]+)", paste0(col_name, "#\\1"), x[[indC]], perl = T),  
+           x[[indC]])})]
+}
+
 ## settings -------------------------------------------------------------------
 
 ### reference genome
@@ -240,7 +286,7 @@ dtPanFeatsGns[, Ν_pres := rowSums(!is.na(as.matrix(.SD))),
 ### fraction of haplotypes with at least one region in the sub-block
 dtPanFeatsGns[, F_pres := c(Ν_pres / nHaplos) ]
 
-## core and dispensable sub-blocks statistics (haplotype-based) ---------------
+## core and dispensable sub-blocks statistics (per haplotype) -----------------
 
 ### all core
 cat("[", myName, "] ",
@@ -339,3 +385,9 @@ fwrite(file = pathCountSblocsRegs, x = dtCounts, sep = "\t",
 
 cvSbloc <- sd(dtCounts[, N_sblocks]) / mean(dtCounts[, N_sblocks])
 cvRegis <- sd(dtCounts[, N_regions]) / mean(dtCounts[, N_regions])
+
+## core and dispensable sub-blocks statistics (per genome) --------------------
+
+### the columns to modify
+modCols <- firstHaploCol:lastHaploCol
+addColPref(dtPanFeatsGns, modCols)
