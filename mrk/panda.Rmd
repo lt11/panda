@@ -190,7 +190,7 @@ for (indR in vtRef) {
   ### id
   strIdPref <- paste0(sub(pattern = "-", replacement = "#", x = indR), "#")
   ### convert the start coordinate from 0-based (gff) to 1-based (bed)
-  dtGff[S_coord := S_coord - 1]
+  dtGff[, S_coord := S_coord - 1]
   ### check start and end coordinates: if start = end and impg breaks
   nBad <- nrow(dtGff[S_coord >= E_coord])
   if (nBad > 0) {
@@ -242,8 +242,18 @@ for (indS in vtStrainHaplo) {
   colnames(dtGff) <- hdGff
   ### id
   strIdPref <- paste0(sub(pattern = "-", replacement = "#", x = indS), "#")
-  ### check start and end coordinates: sometimes start = end and impg breaks
-  dtGff <- dtGff[S_coord < E_coord]
+  ### convert the start coordinate from 0-based (gff) to 1-based (bed)
+  dtGff[, S_coord := S_coord - 1]
+  ### check start and end coordinates: if start = end and impg breaks
+  nBad <- nrow(dtGff[S_coord >= E_coord])
+  if (nBad > 0) {
+    cat("[", myName, "] ",
+        "Found ", nBad,
+        " annotations with the start coordinate larger or equal to",
+        " the end coordinate that will be removed.\n",
+        sep = "")
+    dtGff <- dtGff[S_coord < E_coord]
+  }
   ### filter features
   dtGff <- dtGff[Feat_type %in% vtClassSrt, ]
   ### make the feature id column
