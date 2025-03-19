@@ -293,40 +293,24 @@ library(tictoc)
 
 ## function(s) ----------------------------------------------------------------
 
-#' Extract a Specific Substring from a Split Character Column
-#'
-#' This function splits each element in a character vector 
-#' based on a specified delimiter 
-#' and extracts a specific substring (sub-column) by position.
-#'
-#' @param x A character vector where each element 
-#'          contains substrings separated by a delimiter.
-#' @param n An integer specifying the position of the substring 
-#'          to extract after splitting.
-#' @param s A character string used as the delimiter 
-#'          for splitting the elements of `x`.
-#' @return A character vector containing the extracted 
-#'         substrings from the specified position.
-#' @examples
-#' # Example usage:
-#' SplitSubCol(c("A-B-C", "D-E-F", "G-H-I"), n = 2, s = "-") 
-#' # Returns c("B", "E", "H")
-#' 
-#' SplitSubCol(c("apple,banana,grape", "car,truck,bike"), n = 3, s = ",")
-#' # Returns c("grape", "bike")
-#' 
-#' SplitSubCol(c("X:Y:Z", "A:B"), n = 2, s = ":")
-#' # Returns c("Y", "B")
-#' @export
 SplitSubCol <- function(x, n, s) {
   y <- sapply(strsplit(x, split = s, fixed = T), "[[", n)
   return(y)
 }
+### It splits a character column of a data-table and collects one sub-column.
+### 
+### Arguments:
+### (1) x: a character column of a data-table
+### (2) n: the number of sub-column to print in output
+### (3) s: the string to apply the split
+###
+### Returns:
+### (1) y: a character vector
 
 ## settings -------------------------------------------------------------------
 
-### size threshold: smaller overlaps (in bp) are removed
-sizeLim <- 5
+### size threshold: smaller overlaps are removed
+sizeLim <- 25
 ### fixed settings
 dirBase <- dirname(this.dir())
 ### dev dirBase <- "/Users/Lorenzo/dev/panda"
@@ -336,7 +320,7 @@ unlink(dirOut, recursive = T)
 dir.create(dirOut, showWarnings = F)
 pathGen <- file.path(dirOut, "generators.txt")
 cat("class:feature#strand", "\n", file = pathGen)
-prefRef <- "SGDref"
+idRef <- "SGDref"
 hdImpg <- c("Query_id", "Query_start", "Query_end",
             "Target_id", "Target_start", "Target_end",
             "Target_clsfeat", "N_score", "Query_alndir", "Target_alndir")
@@ -400,8 +384,8 @@ for (indS in vtStrainHaplo) {
   
   ### string for bash (impg-0.2.0)
   strBashImpg <- paste0("impg -I -p ", pathAlnPaf, " -b ", pathAnnoBed)
-  ### string for bash (impg-0.2.3)
-  ### strBashImpg <- paste0("impg query -I -p ", pathAlnPaf, " -b ", pathAnnoBed)
+  # ### string for bash (impg-0.2.3)
+  # strBashImpg <- paste0("impg query -I -p ", pathAlnPaf, " -b ", pathAnnoBed)
   
   strOut <- system(strBashImpg, intern = T)
   ### make a single-file data-table
@@ -431,12 +415,15 @@ dtImpgAll[, Target_cls := SplitSubCol(Target_clsfeat, 1, ":")]
 dtImpgAll[, c("Target_start", "Target_end") := lapply(.SD, as.numeric),
           .SDcols = c("Target_start", "Target_end")]
 dtImpgAll[, Target_len := Target_end - Target_start]
+dtImpgAll[, Query_len := Query_end - Query_start]
 
 ## overlap size filter --------------------------------------------------------
 
+length(which(dtImpgAll$Query_len > dtImpgAll$Target_len))
+
 ### size filter
 dtImpgAllSzFlt <- dtImpgAll[Target_len > sizeLim
-                            & Query_end - Query_start > sizeLim]
+                            & Query_len > sizeLim]
 cat("[", myName, "] ",
     "Overlap size filter. ",
     "\n", sep = "")

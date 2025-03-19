@@ -28,7 +28,7 @@ SplitSubCol <- function(x, n, s) {
 ## settings -------------------------------------------------------------------
 
 ### size threshold: smaller overlaps are removed
-sizeLim <- 5
+sizeLim <- 25
 ### fixed settings
 dirBase <- dirname(this.dir())
 ### dev dirBase <- "/Users/Lorenzo/dev/panda"
@@ -102,8 +102,8 @@ for (indS in vtStrainHaplo) {
   
   ### string for bash (impg-0.2.0)
   strBashImpg <- paste0("impg -I -p ", pathAlnPaf, " -b ", pathAnnoBed)
-  ### string for bash (impg-0.2.3)
-  ### strBashImpg <- paste0("impg query -I -p ", pathAlnPaf, " -b ", pathAnnoBed)
+  # ### string for bash (impg-0.2.3)
+  # strBashImpg <- paste0("impg query -I -p ", pathAlnPaf, " -b ", pathAnnoBed)
   
   strOut <- system(strBashImpg, intern = T)
   ### make a single-file data-table
@@ -133,12 +133,15 @@ dtImpgAll[, Target_cls := SplitSubCol(Target_clsfeat, 1, ":")]
 dtImpgAll[, c("Target_start", "Target_end") := lapply(.SD, as.numeric),
           .SDcols = c("Target_start", "Target_end")]
 dtImpgAll[, Target_len := Target_end - Target_start]
+dtImpgAll[, Query_len := Query_end - Query_start]
 
 ## overlap size filter --------------------------------------------------------
 
+length(which(dtImpgAll$Query_len > dtImpgAll$Target_len))
+
 ### size filter
 dtImpgAllSzFlt <- dtImpgAll[Target_len > sizeLim
-                            & Query_end - Query_start > sizeLim]
+                            & Query_len > sizeLim]
 cat("[", myName, "] ",
     "Overlap size filter. ",
     "\n", sep = "")
