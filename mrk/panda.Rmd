@@ -308,19 +308,29 @@ library(tictoc)
 
 ## function(s) ----------------------------------------------------------------
 
+#' Split and Extract a Specific Sub-Column from a Character Column
+#'
+#' This function splits a character column using a specified delimiter and extracts
+#' the desired sub-column based on the given index.
+#'
+#' @param x A character vector, typically a column from a data table.
+#' @param n An integer specifying the index of the sub-column 
+#'          to extract after splitting.
+#' @param s A character string representing the delimiter used for splitting.
+#'
+#' @return A character vector containing the extracted sub-column values.
+#'
+#' @examples
+#' # example usage:
+#' vec <- c("A|B|C", "D|E|F", "G|H|I")
+#' # extract the second sub-column
+#' SplitSubCol(vec, 2, "|")  
+#'
+#' @export
 SplitSubCol <- function(x, n, s) {
-  y <- sapply(strsplit(x, split = s, fixed = T), "[[", n)
+  y <- sapply(strsplit(x, split = s, fixed = TRUE), "[[", n)
   return(y)
 }
-### It splits a character column of a data-table and collects one sub-column.
-### 
-### Arguments:
-### (1) x: a character column of a data-table
-### (2) n: the number of sub-column to print in output
-### (3) s: the string to apply the split
-###
-### Returns:
-### (1) y: a character vector
 
 ## settings -------------------------------------------------------------------
 
@@ -693,10 +703,10 @@ library(scriptName)
 #'          from which non-NA values will be counted.
 #' @return An integer representing the number of non-NA values in `x`.
 #' @examples
-#' # Example usage:
-#' CountNoNa(c(1, 2, NA, 4, NA))   # Returns 3
-#' CountNoNa(c("A", "B", NA, "D")) # Returns 3
-#' CountNoNa(c(TRUE, NA, FALSE, TRUE)) # Returns 3
+#' # example usage:
+#' CountNoNa(c(1, 2, NA, 4, NA))    # Returns 3
+#' CountNoNa(c("A", "B", NA, "D"))  # Returns 3
+#' CountNoNa(c(TRUE, NA, NA, TRUE)) # Returns 2
 #' @export
 CountNoNa <- function(x) {
   sum(!is.na(x))
@@ -717,7 +727,7 @@ CountNoNa <- function(x) {
 #' @return An integer representing the total number of elements after splitting 
 #'         non-NA values by semicolons.
 #' @examples
-#' # Example usage:
+#' # example usage:
 #' CountSemicSep(c("A;B;C", "D;E", NA, "F")) # Returns 6 (3+2+1)
 #' CountSemicSep(c(NA, "X;Y;Z", "P;Q", ""))  # Returns 5 (3+2+0)
 #' CountSemicSep(c(NA, NA))                  # Returns 0
@@ -740,7 +750,7 @@ CountSemicSep <- function(x) {
 #'         represents the number of features 
 #'         in the corresponding element of `x`.
 #' @examples
-#' # Example usage:
+#' # example usage:
 #' CountAnyFeat(c("A,B,C", "D,E", NA, "F")) # Returns c(3, 2, NA, 1)
 #' CountAnyFeat(c("X,Y,Z", "P,Q", "R", "")) # Returns c(3, 2, 1, 1)
 #' CountAnyFeat(c(NA, NA, "A,B"))           # Returns c(NA, NA, 2)
@@ -765,15 +775,15 @@ CountAnyFeat <- function(x) {
 #'         the number of systematic gene matches 
 #'         in the corresponding element of `x`.
 #' @examples
-#' # Example usage:
+#' # example usage:
 #' CountSysFeat(c("YAL001W,YBR102C", "YDL113C,YGR098W", NA, "YPR202W")) 
-#' # Returns c(2, 2, NA, 1)
+#' # returns c(2, 2, NA, 1)
 #' 
 #' CountSysFeat(c("YAL003W", "YCR008W,YHR209C", "NotAGene", "Blinda")) 
-#' # Returns c(1, 2, 0, 0)
+#' # returns c(1, 2, 0, 0)
 #' 
 #' CountSysFeat(c(NA, NA, "YML075C,YPL197W,YJL112W")) 
-#' # Returns c(NA, NA, 3)
+#' # returns c(NA, NA, 3)
 #' @export
 CountSysFeat <- function(x) {
   ### the pattern for systematic yeast gene names
@@ -800,15 +810,15 @@ CountSysFeat <- function(x) {
 #'         the number of random ID gene matches 
 #'         in the corresponding element of `x`.
 #' @examples
-#' # Example usage:
+#' # example usage:
 #' CountRidFeat(c("ABA_G0053280,CMF_HP1_G0054150", "AAB_G7654321"))
-#' # Returns c(2, 1)
+#' # returns c(2, 1)
 #' 
 #' CountRidFeat(c("DBVPG6765_G0027560,YFL051C,YJL216C", "", "NoMatch"))
-#' # Returns c(1, 0, 0)
+#' # returns c(1, 0, 0)
 #' 
 #' CountRidFeat(c(NA, NA, "AAB_G5555555,AIL_G6666666"))
-#' # Returns c(NA, NA, 2)
+#' # returns c(NA, NA, 2)
 #' @export
 CountRidFeat <- function(x) {
   ### the pattern for random ID genes
