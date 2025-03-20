@@ -11,19 +11,29 @@ library(tictoc)
 
 ## function(s) ----------------------------------------------------------------
 
+#' Split and Extract a Specific Sub-Column from a Character Column
+#'
+#' This function splits a character column using a specified delimiter and extracts
+#' the desired sub-column based on the given index.
+#'
+#' @param x A character vector, typically a column from a data table.
+#' @param n An integer specifying the index of the sub-column 
+#'          to extract after splitting.
+#' @param s A character string representing the delimiter used for splitting.
+#'
+#' @return A character vector containing the extracted sub-column values.
+#'
+#' @examples
+#' # example usage:
+#' vec <- c("A|B|C", "D|E|F", "G|H|I")
+#' # extract the second sub-column
+#' SplitSubCol(vec, 2, "|")  
+#'
+#' @export
 SplitSubCol <- function(x, n, s) {
-  y <- sapply(strsplit(x, split = s, fixed = T), "[[", n)
+  y <- sapply(strsplit(x, split = s, fixed = TRUE), "[[", n)
   return(y)
 }
-### It splits a character column of a data-table and collects one sub-column.
-### 
-### Arguments:
-### (1) x: a character column of a data-table
-### (2) n: the number of sub-column to print in output
-### (3) s: the string to apply the split
-###
-### Returns:
-### (1) y: a character vector
 
 ## settings -------------------------------------------------------------------
 

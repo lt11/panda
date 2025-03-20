@@ -16,10 +16,10 @@ library(scriptName)
 #'          from which non-NA values will be counted.
 #' @return An integer representing the number of non-NA values in `x`.
 #' @examples
-#' # Example usage:
-#' CountNoNa(c(1, 2, NA, 4, NA))   # Returns 3
-#' CountNoNa(c("A", "B", NA, "D")) # Returns 3
-#' CountNoNa(c(TRUE, NA, FALSE, TRUE)) # Returns 3
+#' # example usage:
+#' CountNoNa(c(1, 2, NA, 4, NA))    # Returns 3
+#' CountNoNa(c("A", "B", NA, "D"))  # Returns 3
+#' CountNoNa(c(TRUE, NA, NA, TRUE)) # Returns 2
 #' @export
 CountNoNa <- function(x) {
   sum(!is.na(x))
@@ -40,7 +40,7 @@ CountNoNa <- function(x) {
 #' @return An integer representing the total number of elements after splitting 
 #'         non-NA values by semicolons.
 #' @examples
-#' # Example usage:
+#' # example usage:
 #' CountSemicSep(c("A;B;C", "D;E", NA, "F")) # Returns 6 (3+2+1)
 #' CountSemicSep(c(NA, "X;Y;Z", "P;Q", ""))  # Returns 5 (3+2+0)
 #' CountSemicSep(c(NA, NA))                  # Returns 0
@@ -63,7 +63,7 @@ CountSemicSep <- function(x) {
 #'         represents the number of features 
 #'         in the corresponding element of `x`.
 #' @examples
-#' # Example usage:
+#' # example usage:
 #' CountAnyFeat(c("A,B,C", "D,E", NA, "F")) # Returns c(3, 2, NA, 1)
 #' CountAnyFeat(c("X,Y,Z", "P,Q", "R", "")) # Returns c(3, 2, 1, 1)
 #' CountAnyFeat(c(NA, NA, "A,B"))           # Returns c(NA, NA, 2)
@@ -88,15 +88,15 @@ CountAnyFeat <- function(x) {
 #'         the number of systematic gene matches 
 #'         in the corresponding element of `x`.
 #' @examples
-#' # Example usage:
+#' # example usage:
 #' CountSysFeat(c("YAL001W,YBR102C", "YDL113C,YGR098W", NA, "YPR202W")) 
-#' # Returns c(2, 2, NA, 1)
+#' # returns c(2, 2, NA, 1)
 #' 
 #' CountSysFeat(c("YAL003W", "YCR008W,YHR209C", "NotAGene", "Blinda")) 
-#' # Returns c(1, 2, 0, 0)
+#' # returns c(1, 2, 0, 0)
 #' 
 #' CountSysFeat(c(NA, NA, "YML075C,YPL197W,YJL112W")) 
-#' # Returns c(NA, NA, 3)
+#' # returns c(NA, NA, 3)
 #' @export
 CountSysFeat <- function(x) {
   ### the pattern for systematic yeast gene names
@@ -123,15 +123,15 @@ CountSysFeat <- function(x) {
 #'         the number of random ID gene matches 
 #'         in the corresponding element of `x`.
 #' @examples
-#' # Example usage:
+#' # example usage:
 #' CountRidFeat(c("ABA_G0053280,CMF_HP1_G0054150", "AAB_G7654321"))
-#' # Returns c(2, 1)
+#' # returns c(2, 1)
 #' 
 #' CountRidFeat(c("DBVPG6765_G0027560,YFL051C,YJL216C", "", "NoMatch"))
-#' # Returns c(1, 0, 0)
+#' # returns c(1, 0, 0)
 #' 
 #' CountRidFeat(c(NA, NA, "AAB_G5555555,AIL_G6666666"))
-#' # Returns c(NA, NA, 2)
+#' # returns c(NA, NA, 2)
 #' @export
 CountRidFeat <- function(x) {
   ### the pattern for random ID genes
@@ -141,52 +141,6 @@ CountRidFeat <- function(x) {
   y <- sapply(gregexpr(ptnRid, x, perl = T), function(x) sum(x > 0))
   
   return(y)
-}
-
-#' Prepend Column Names to Substrings in Selected Columns of a data.table
-#'
-#' This function modifies a `data.table` by prepending each value 
-#' in the specified columns 
-#' with the corresponding column name followed by `#`. 
-#' Substrings within a column are assumed 
-#' to be separated by semicolons (`;`). `NA` values remain unchanged.
-#'
-#' @param x A `data.table` containing the dataset to be modified.
-#' @param y A numeric vector of column indices specifying 
-#' which columns should be modified.
-#'
-#' @return The input `data.table` is modified in-place, 
-#' with the selected columns updated 
-#' to have their column names prefixed to each substring.
-#'
-#' @examples
-#' library(data.table)
-#' 
-#' # create example data.table
-#' dt <- data.table(ID = 1:3,
-#'                  SGD#0 = c("chrIV:30-32", "chrXIV:386-541;chrXIV:260-415", NA),
-#'                  AAB#1 = c("", "chrV:35-80", "chrXII:99-111"))
-#' 
-#' # define columns to modify 
-#' (assuming SGD#0 is in column 2 and AAB#1 in column 3)
-#' modCols <- c(2, 3)
-#'
-#' # apply the function
-#' addColPref(dt, modCols)
-#'
-#' # expected output:
-#' #     ID   SGD#0                                        AAB#1
-#' # 1:  1    SGD#0#chrIV:30-32                            ""  (unchanged)
-#' # 2:  2    SGD#0#chrXIV:386-541;SGD#0chrXIV:260-415     AAB#1#chrV:35-80
-#' # 3:  3    NA (unchanged)                               AAB#1#chrXII:99-111
-#'
-#' @export
-addColPref <- function(x, y) {
-  x[, (y) := lapply(y, function(indC) {
-    col_name <- names(x)[indC]
-    ifelse(!is.na(x[[indC]]),
-           gsub("([^;]+)", paste0(col_name, "#\\1"), x[[indC]], perl = T),  
-           x[[indC]])})]
 }
 
 ## settings -------------------------------------------------------------------
@@ -286,7 +240,7 @@ dtPanFeatsGns[, Ν_pres := rowSums(!is.na(as.matrix(.SD))),
 ### fraction of haplotypes with at least one region in the sub-block
 dtPanFeatsGns[, F_pres := c(Ν_pres / nHaplos) ]
 
-## core and dispensable sub-blocks statistics (per haplotype) -----------------
+## core and dispensable sub-blocks statistics (haplotype-based) ---------------
 
 ### all core
 cat("[", myName, "] ",
@@ -346,7 +300,7 @@ fwrite(file = pathPanGenes, x = dtPanFeatsGns, sep = "\t",
 
 ### number of non-reference private features per haplotype
 tbNorefPriv <- table(dtPanFeatsGns[Ν_pres == 1 & N_feats_rid == 1,
-                              sub("_(?!.*_).*", "", Features_id, perl = T)])
+                                   sub("_(?!.*_).*", "", Features_id, perl = T)])
 ### save
 write.table(tbNorefPriv, file = pathNorefPriv, quote = F, sep = "\t",
             row.names = F, col.names = c("Haplo_id", "N_priv"))
@@ -385,9 +339,3 @@ fwrite(file = pathCountSblocsRegs, x = dtCounts, sep = "\t",
 
 cvSbloc <- sd(dtCounts[, N_sblocks]) / mean(dtCounts[, N_sblocks])
 cvRegis <- sd(dtCounts[, N_regions]) / mean(dtCounts[, N_regions])
-
-## core and dispensable sub-blocks statistics (per genome) --------------------
-
-### the columns to modify
-modCols <- firstHaploCol:lastHaploCol
-addColPref(dtPanFeatsGns, modCols)
