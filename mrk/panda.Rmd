@@ -709,7 +709,8 @@ library(scriptName)
 #' CountNoNa(c(TRUE, NA, NA, TRUE)) # returns 2
 #' @export
 CountNoNa <- function(x) {
-  sum(!is.na(x))
+  z <- sum(!is.na(x))
+  return(z)
 }
 
 #' Count Semicolon-Separated Sub-strings in a Vector
@@ -733,7 +734,8 @@ CountNoNa <- function(x) {
 #' CountSemicSep(c(NA, NA))                  # returns 0
 #' @export
 CountSemicSep <- function(x) {
-  sum(lengths(strsplit(x[!is.na(x)], ";")))
+  z <- sum(lengths(strsplit(x[!is.na(x)], ";")))
+  return(z)
 }
 
 #' Count Features in a Comma-Separated String
@@ -830,6 +832,122 @@ CountRidFeat <- function(x) {
   return(y)
 }
 
+#' Prepend Column Names to Substrings in Selected Columns of a data.table
+#'
+#' This function modifies a `data.table` by prepending each value 
+#' in the specified columns 
+#' with the corresponding column name followed by `#`. 
+#' Substrings within a column are assumed 
+#' to be separated by semicolons (`;`). `NA` values remain unchanged.
+#'
+#' @param x A `data.table` containing the dataset to be modified.
+#' @param y A numeric vector of column indices specifying 
+#'          which columns should be modified.
+#'
+#' @return The input `data.table` is modified in-place, 
+#' with the selected columns updated 
+#' to have their column names prefixed to each substring.
+#'
+#' @examples
+#' library(data.table)
+#' 
+#' # create example data.table
+#' dt <- data.table(
+#'   ID = 1:3,
+#'   SGD#0 = c("chrIV:30-32", "chrXIV:386-541;chrXIV:260-415", NA),
+#'   AAB#1 = c("", "chrV:35-80", "chrXII:99-111")
+#' )
+#' 
+#' # define columns to modify 
+#' # (assuming SGD#0 is in column 2 and AAB#1 in column 3)
+#' indHapCols <- c(2, 3)
+#'
+#' # apply the function
+#' addColPref(dt, indHapCols)
+#'
+#' # expected output:
+#' #     ID   SGD#0                                        AAB#1
+#' # 1:  1    SGD#0#chrIV:30-32                            ""  (unchanged)
+#' # 2:  2    SGD#0#chrXIV:386-541;SGD#0chrXIV:260-415     AAB#1#chrV:35-80
+#' # 3:  3    NA (unchanged)                               AAB#1#chrXII:99-111
+#'
+#' @export
+addColPref <- function(x, y) {
+  x[, (y) := lapply(y, function(indC) {
+    col_name <- names(x)[indC]
+    ifelse(!is.na(x[[indC]]),
+           gsub("([^;]+)", paste0(col_name, "#\\1"), x[[indC]], perl = T),  
+           x[[indC]])})]
+  return(x)
+}
+
+#' Replace NA Values with Empty Strings in a data.table
+#'
+#' This function modifies a data.table replacing all NA values 
+#' with empty strings ("").
+#' You can choose whether to apply this only to character 
+#' columns or to all columns
+#' (which will coerce all types to character).
+#'
+#' @param x A `data.table` object to modify in-place.
+#' @param y Logical. If `TRUE`, replaces NA in all columns 
+#'          (and coerces to character).
+#'          If `FALSE` (default), replaces only NA values
+#'          in character columns.
+#'
+#' @return The modified `data.table` with NA values replaced by "".
+#' @examples
+#' library(data.table)
+#' x <- data.table(A = c("apple", NA), B = c(NA, "orange"), C = c(1, NA))
+#' replaceNAtoEmpty(x)         # only character columns
+#' replaceNAtoEmpty(x, TRUE)   # all columns, coerced to character
+replaceNAtoEmpty <- function(x, y = F) {
+  if (!data.table::is.data.table(x)) {
+    ### stop prints "Error: " by default
+    stop("input must be a data.table.")
+  }
+  colsToMod <- if (y) names(x) else names(x)[sapply(x, is.character)]
+  
+  x[, (colsToMod) := lapply(.SD, function(x) {
+    x[is.na(x)] <- ""
+    x
+  }), .SDcols = colsToMod]
+  
+  return(x)
+}
+
+#' Replace Empty Strings with NA Values in a data.table
+#'
+#' This function modifies a data.table by replacing all empty strings ("")
+#' with NA values. You can choose whether to apply this only to character 
+#' columns or to all columns (which will coerce all types to character).
+#'
+#' @param x A `data.table` object to modify in-place.
+#' @param y Logical. If `TRUE`, replaces "" in all columns 
+#'          (and coerces to character).
+#'          If `FALSE` (default), replaces only "" values
+#'          in character columns.
+#'
+#' @return The modified `data.table` with "" values replaced by NA.
+#' @examples
+#' library(data.table)
+#' x <- data.table(A = c("apple", ""), B = c("", "orange"), C = c("1", ""))
+#' replaceEmptyToNA(x)         # only character columns
+#' replaceEmptyToNA(x, TRUE)   # all columns, coerced to character
+replaceEmptyToNA <- function(x, y = F) {
+  if (!data.table::is.data.table(x)) {
+    stop("input must be a data.table.")
+  }
+  colsToMod <- if (y) names(x) else names(x)[sapply(x, is.character)]
+  
+  x[, (colsToMod) := lapply(.SD, function(col) {
+    col[col == ""] <- NA
+    col
+  }), .SDcols = colsToMod]
+  
+  return(x)
+}
+
 ## settings -------------------------------------------------------------------
 
 ### reference genome
@@ -848,16 +966,17 @@ dirBase <- dirname(this.dir())
 dirOut <- file.path(dirBase, "sts")
 unlink(dirOut, recursive = T)
 dir.create(dirOut, recursive = T)
-pathPanGenes <- file.path(dirOut, "sts-genes.txt")
+pathPanGenesHaplo <- file.path(dirOut, "sts-genes-haplos.txt")
 pathNorefPriv <- file.path(dirOut, "n-noref-priv.txt")
 pathCountSblocsRegs <- file.path(dirOut, "n-sblocks-regs.txt")
+pathPanGenesGenomes <- file.path(dirOut, "sts-genes-genomes.txt")
 
 ## clmnt ----------------------------------------------------------------------
 
 ### script name
 myName <- current_filename()
 cat("[", myName, "] ",
-    "Making the sub-blocks statistics. ",
+    "Making the statistics. ",
     "\n", sep = "")
 
 ### load SGDref features
@@ -883,9 +1002,7 @@ load(pathInPan)
 ### we need the first and last haplotype columns to correctly subset 
 ### the data-table when we calculate the statistics 
 nHaplos <- ncol(dtPanFeats) - 2
-nSkip <- 2
-firstHaploCol <- 1 + nSkip
-lastHaploCol <- ncol(dtPanFeats)
+indHapCols <- 3:ncol(dtPanFeats)
 
 ## sub-blocks statistics ------------------------------------------------------
 
@@ -921,9 +1038,11 @@ cat("[", myName, "] ",
     nLabellable,
     "\n", sep = "")
 
+## presence (haplotype-based) -------------------------------------------------
+
 ### number of haplotypes with at least one region in the sub-block
 dtPanFeatsGns[, Ν_pres := rowSums(!is.na(as.matrix(.SD))),
-              .SDcols = firstHaploCol:lastHaploCol]
+              .SDcols = indHapCols]
 ### fraction of haplotypes with at least one region in the sub-block
 dtPanFeatsGns[, F_pres := c(Ν_pres / nHaplos) ]
 
@@ -931,48 +1050,49 @@ dtPanFeatsGns[, F_pres := c(Ν_pres / nHaplos) ]
 
 ### all core
 cat("[", myName, "] ",
-    "Number of all-haplotypes core genes: ",
+    "Number of (haplotype-based) core genes: ",
     dtPanFeatsGns[, sum(F_pres == 1)],
     "\n", sep = "")
 ### all but one core
 cat("[", myName, "] ",
-    "Number of N-1 core genes: ",
+    "Number of N-1 (haplotype-based) core genes: ",
     dtPanFeatsGns[, sum(Ν_pres >= c(nHaplos - 1))],
     "\n", sep = "")
 ### all but two core
 cat("[", myName, "] ",
-    "Number of N-2 core genes: ",
+    "Number of N-2 (haplotype-based) core genes: ",
     dtPanFeatsGns[, sum(Ν_pres >= c(nHaplos - 2))],
     "\n", sep = "")
 ### strictly dispensable: 1 ≤ N presence < all
 cat("[", myName, "] ",
-    "Number of strictly dispensable: ",
+    "Number of strictly dispensable genes (haplotype-based): ",
     dtPanFeatsGns[, sum(Ν_pres < nHaplos)],
     "\n", sep = "")
 ### moderately dispensable: 1 < N presence < all
 cat("[", myName, "] ",
-    "Number of strictly dispensable: ",
+    "Number of moderately dispensable (haplotype-based): ",
     dtPanFeatsGns[, sum(Ν_pres < nHaplos
                         & 1 < Ν_pres)],
     "\n", sep = "")
 ### 1-leniently dispensable: 1 < N presence < all - 1
 cat("[", myName, "] ",
-    "Number of 1-leniently dispensable: ",
+    "Number of 1-leniently dispensable (haplotype-based): ",
     dtPanFeatsGns[, sum(Ν_pres < c(nHaplos - 1)
                         & 1 < Ν_pres)],
     "\n", sep = "")
 ### 2-leniently dispensable: 1 < N presence < all - 2
 cat("[", myName, "] ",
-    "Number of 1-leniently dispensable: ",
+    "Number of 2-leniently dispensable (haplotype-based): ",
     dtPanFeatsGns[, sum(Ν_pres < c(nHaplos - 2)
                         & 1 < Ν_pres)],
     "\n", sep = "")
 ### private
 cat("[", myName, "] ",
-    "Number of private genes: ", dtPanFeatsGns[, sum(Ν_pres == 1)],
+    "Number of private genes (haplotype-based): ",
+    dtPanFeatsGns[, sum(Ν_pres == 1)],
     "\n", sep = "")
 
-## decomposition of the features in each sub-block ----------------------------
+## decomposition of the features in each sub-block (haplotype-based) ----------
 
 ### count how many features are present in a sub-block with gregexpr
 ### and using integers only (e.g. 1L), although it does not work with empty 
@@ -982,19 +1102,20 @@ dtPanFeatsGns[, N_feats_sys := CountSysFeat(Features_id)]
 dtPanFeatsGns[, N_feats_rid := CountRidFeat(Features_id)]
 
 ### save dtPanFeatsGns with counts
-fwrite(file = pathPanGenes, x = dtPanFeatsGns, sep = "\t",
+fwrite(file = pathPanGenesHaplo, x = dtPanFeatsGns, sep = "\t",
        row.names = F, col.names = T)
 
 ### number of non-reference private features per haplotype
 tbNorefPriv <- table(dtPanFeatsGns[Ν_pres == 1 & N_feats_rid == 1,
-                              sub("_(?!.*_).*", "", Features_id, perl = T)])
+                                   sub("_(?!.*_).*", "",
+                                       Features_id,
+                                       perl = T)])
 ### save
 write.table(tbNorefPriv, file = pathNorefPriv, quote = F, sep = "\t",
             row.names = F, col.names = c("Haplo_id", "N_priv"))
 
 ### check if N_feats[i] = N_feats_sys[i] + N_feats_rid[i]
-dtPanFeatsGns[, Good_sum := ifelse(N_feats_sys + N_feats_rid == N_feats,
-                                   T, F)]
+dtPanFeatsGns[, Good_sum := ifelse(N_feats_sys + N_feats_rid == N_feats, T, F)]
 nTrue <- dtPanFeatsGns[, sum(Good_sum)]
 if (nTrue != nrow(dtPanFeatsGns)) {
   cat("[", myName, "] ",
@@ -1006,14 +1127,12 @@ if (nTrue != nrow(dtPanFeatsGns)) {
   stop("features patterns probably did not work.")
 }
 
-## count sub-blocks and regions per haplotype ---------------------------------
+## count sub-blocks and regions (haplotype-based) -----------------------------
 
 dtSb <- dtPanFeatsGns[, lapply(.SD, CountNoNa), 
-                      .SDcols = firstHaploCol:lastHaploCol]
-
+                      .SDcols = indHapCols]
 dtRe <- dtPanFeatsGns[, lapply(.SD, CountSemicSep),
-                      .SDcols = firstHaploCol:lastHaploCol]
-
+                      .SDcols = indHapCols]
 dtN <- rbindlist(list(dtSb, dtRe))
 dtT <- transpose(dtN)
 dtCounts <- data.table(colnames(dtN),
@@ -1026,5 +1145,107 @@ fwrite(file = pathCountSblocsRegs, x = dtCounts, sep = "\t",
 
 cvSbloc <- sd(dtCounts[, N_sblocks]) / mean(dtCounts[, N_sblocks])
 cvRegis <- sd(dtCounts[, N_regions]) / mean(dtCounts[, N_regions])
+
+## collapse haplotypes into genomes ------------------------------------------
+
+dtTmp <- dtPanFeatsGns[, .SD, .SDcols = c(1:2, indHapCols)]
+addColPref(dtTmp, indHapCols)
+replaceNAtoEmpty(dtTmp)
+### remove numeric suffix
+vtGnmIds <- gsub("#[0-9]+$", "", names(dtTmp)[indHapCols])
+### change column names and identify unique indPes
+names(dtTmp)[indHapCols] <-  vtGnmIds
+vtGnmIdsUniq <- unique(vtGnmIds)
+
+### initialize output with genome columns
+dtPanFeatsGnsGnm <- dtTmp[, .(Class_id, Features_id)]
+
+### process each unique prefix
+for (indP in vtGnmIdsUniq) {
+  vtColMatched <- which(names(dtTmp) == indP)
+  
+  if (length(vtColMatched) > 1) {
+    colsBon <- dtTmp[, ..vtColMatched]
+    dtPanFeatsGnsGnm[, (indP) := do.call(paste, c(colsBon, sep = ";"))]
+    dtPanFeatsGnsGnm[, (indP) := gsub("^;|;$", "", get(indP))]
+  } else if (length(vtColMatched) == 1) {
+    dtPanFeatsGnsGnm[, (indP) := dtTmp[[vtColMatched]]]
+  }
+}
+replaceEmptyToNA(dtPanFeatsGnsGnm)
+
+### garbage collection
+rm(dtTmp)
+invisible(gc())
+
+## presence (genome-based) ----------------------------------------------------
+
+nGenomes <- ncol(dtPanFeatsGnsGnm) - 2
+indGnmCols <- 3:ncol(dtPanFeatsGnsGnm)
+
+### number of genomes with at least one region in the sub-block
+dtPanFeatsGnsGnm[, Ν_pres := rowSums(!is.na(as.matrix(.SD))),
+              .SDcols = indGnmCols]
+### fraction of genomes with at least one region in the sub-block
+dtPanFeatsGnsGnm[, F_pres := c(Ν_pres / nGenomes) ]
+
+## core and dispensable sub-blocks statistics (genome-based) ------------------
+
+### all core
+cat("[", myName, "] ",
+    "Number of (genome-based) core genes: ",
+    dtPanFeatsGnsGnm[, sum(F_pres == 1)],
+    "\n", sep = "")
+### all but one core
+cat("[", myName, "] ",
+    "Number of N-1 (genome-based) core genes: ",
+    dtPanFeatsGnsGnm[, sum(Ν_pres >= c(nGenomes - 1))],
+    "\n", sep = "")
+### all but two core
+cat("[", myName, "] ",
+    "Number of N-2 (genome-based) core genes: ",
+    dtPanFeatsGnsGnm[, sum(Ν_pres >= c(nGenomes - 2))],
+    "\n", sep = "")
+### strictly dispensable: 1 ≤ N presence < all
+cat("[", myName, "] ",
+    "Number of strictly dispensable genes (genome-based): ",
+    dtPanFeatsGnsGnm[, sum(Ν_pres < nGenomes)],
+    "\n", sep = "")
+### moderately dispensable: 1 < N presence < all
+cat("[", myName, "] ",
+    "Number of moderately dispensable (genome-based): ",
+    dtPanFeatsGnsGnm[, sum(Ν_pres < nGenomes
+                           & 1 < Ν_pres)],
+    "\n", sep = "")
+### 1-leniently dispensable: 1 < N presence < all - 1
+cat("[", myName, "] ",
+    "Number of 1-leniently dispensable (genome-based): ",
+    dtPanFeatsGnsGnm[, sum(Ν_pres < c(nGenomes - 1)
+                           & 1 < Ν_pres)],
+    "\n", sep = "")
+### 2-leniently dispensable: 1 < N presence < all - 2
+cat("[", myName, "] ",
+    "Number of 2-leniently dispensable (genome-based): ",
+    dtPanFeatsGnsGnm[, sum(Ν_pres < c(nGenomes - 2)
+                           & 1 < Ν_pres)],
+    "\n", sep = "")
+### private
+cat("[", myName, "] ",
+    "Number of private genes (genome-based): ",
+    dtPanFeatsGnsGnm[, sum(Ν_pres == 1)],
+    "\n", sep = "")
+
+## decomposition of the features in each sub-block (genome-based) -------------
+
+### count how many features are present in a sub-block with gregexpr
+### and using integers only (e.g. 1L), although it does not work with empty 
+### strings (but this cannot happen in dtPanFeatsGns[, Features_id])
+dtPanFeatsGnsGnm[, N_feats := CountAnyFeat(Features_id)]
+dtPanFeatsGnsGnm[, N_feats_sys := CountSysFeat(Features_id)]
+dtPanFeatsGnsGnm[, N_feats_rid := CountRidFeat(Features_id)]
+
+### save dtPanFeatsGnsGnmGnm with counts
+fwrite(file = pathPanGenesGenomes, x = dtPanFeatsGnsGnm, sep = "\t",
+       row.names = F, col.names = T)
 
 ```
