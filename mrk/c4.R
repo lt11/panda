@@ -22,7 +22,8 @@ library(scriptName)
 #' CountNoNa(c(TRUE, NA, NA, TRUE)) # returns 2
 #' @export
 CountNoNa <- function(x) {
-  sum(!is.na(x))
+  z <- sum(!is.na(x))
+  return(z)
 }
 
 #' Count Semicolon-Separated Sub-strings in a Vector
@@ -46,7 +47,8 @@ CountNoNa <- function(x) {
 #' CountSemicSep(c(NA, NA))                  # returns 0
 #' @export
 CountSemicSep <- function(x) {
-  sum(lengths(strsplit(x[!is.na(x)], ";")))
+  z <- sum(lengths(strsplit(x[!is.na(x)], ";")))
+  return(z)
 }
 
 #' Count Features in a Comma-Separated String
@@ -189,6 +191,7 @@ addColPref <- function(x, y) {
     ifelse(!is.na(x[[indC]]),
            gsub("([^;]+)", paste0(col_name, "#\\1"), x[[indC]], perl = T),  
            x[[indC]])})]
+  return(x)
 }
 
 #' Replace NA Values with Empty Strings in a data.table
