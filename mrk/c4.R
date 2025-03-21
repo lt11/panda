@@ -216,11 +216,7 @@ repNAwithEmptyChar <- function(x, y = F) {
     ### stop prints "Error: " by default
     stop("input must be a data.table.")
   }
-  colsToMod <- if (y) {
-    names(x)
-  } else {
-    names(x)[sapply(x, is.character)]
-  }
+  colsToMod <- if (y) names(x) else names(x)[sapply(x, is.character)]
   
   x[, (colsToMod) := lapply(.SD, function(x) {
     x[is.na(x)] <- ""
@@ -285,7 +281,7 @@ load(pathInPan)
 nHaplos <- ncol(dtPanFeats) - 2
 indHapCols <- 3:ncol(dtPanFeats)
 
-## sub-blocks statistics ------------------------------------------------------
+## sub-blocks statistics (haplotype-based) ------------------------------------
 
 dtPanFeatsGns <- dtPanFeats[Class_id == strSblock]
 cat("[", myName, "] ",
@@ -405,7 +401,7 @@ if (nTrue != nrow(dtPanFeatsGns)) {
   stop("features patterns probably did not work.")
 }
 
-## count sub-blocks and regions per haplotype ---------------------------------
+## count sub-blocks and regions (haplotype-based) -----------------------------
 
 dtSb <- dtPanFeatsGns[, lapply(.SD, CountNoNa), 
                       .SDcols = indHapCols]
