@@ -191,6 +191,45 @@ addColPref <- function(x, y) {
            x[[indC]])})]
 }
 
+#' Replace NA Values with Empty Strings in a data.table
+#'
+#' This function modifies a data.table replacing all NA values 
+#' with empty strings ("").
+#' You can choose whether to apply this only to character 
+#' columns or to all columns
+#' (which will coerce all types to character).
+#'
+#' @param x A `data.table` object to modify in-place.
+#' @param y Logical. If `TRUE`, replaces NA in all columns 
+#'          (and coerces to character).
+#'          If `FALSE` (default), replaces only NA values
+#'          in character columns.
+#'
+#' @return The modified `data.table` with NA values replaced by "".
+#' @examples
+#' library(data.table)
+#' x <- data.table(A = c("apple", NA), B = c(NA, "orange"), C = c(1, NA))
+#' repNAwithEmptyChar(x)         # only character columns
+#' repNAwithEmptyChar(x, TRUE)   # all columns, coerced to character
+repNAwithEmptyChar <- function(x, y = F) {
+  if (!data.table::is.data.table(x)) {
+    ### stop prints "Error: " by default
+    stop("input must be a data.table.")
+  }
+  colsToMod <- if (y) {
+    names(x)
+  } else {
+    names(x)[sapply(x, is.character)]
+  }
+  
+  x[, (colsToMod) := lapply(.SD, function(x) {
+    x[is.na(x)] <- ""
+    x
+  }), .SDcols = colsToMod]
+  
+  return(x)
+}
+
 ## settings -------------------------------------------------------------------
 
 ### reference genome
@@ -290,48 +329,49 @@ dtPanFeatsGns[, F_pres := c(Ν_pres / nHaplos) ]
 
 ### all core
 cat("[", myName, "] ",
-    "Number of all-haplotypes core genes: ",
+    "Number of (haplotype-based) core genes: ",
     dtPanFeatsGns[, sum(F_pres == 1)],
     "\n", sep = "")
 ### all but one core
 cat("[", myName, "] ",
-    "Number of N-1 core genes: ",
+    "Number of N-1 (haplotype-based) core genes: ",
     dtPanFeatsGns[, sum(Ν_pres >= c(nHaplos - 1))],
     "\n", sep = "")
 ### all but two core
 cat("[", myName, "] ",
-    "Number of N-2 core genes: ",
+    "Number of N-2 (haplotype-based) core genes: ",
     dtPanFeatsGns[, sum(Ν_pres >= c(nHaplos - 2))],
     "\n", sep = "")
 ### strictly dispensable: 1 ≤ N presence < all
 cat("[", myName, "] ",
-    "Number of strictly dispensable: ",
+    "Number of strictly dispensable genes (haplotype-based): ",
     dtPanFeatsGns[, sum(Ν_pres < nHaplos)],
     "\n", sep = "")
 ### moderately dispensable: 1 < N presence < all
 cat("[", myName, "] ",
-    "Number of strictly dispensable: ",
+    "Number of moderately dispensable (haplotype-based): ",
     dtPanFeatsGns[, sum(Ν_pres < nHaplos
                         & 1 < Ν_pres)],
     "\n", sep = "")
 ### 1-leniently dispensable: 1 < N presence < all - 1
 cat("[", myName, "] ",
-    "Number of 1-leniently dispensable: ",
+    "Number of 1-leniently dispensable (haplotype-based): ",
     dtPanFeatsGns[, sum(Ν_pres < c(nHaplos - 1)
                         & 1 < Ν_pres)],
     "\n", sep = "")
 ### 2-leniently dispensable: 1 < N presence < all - 2
 cat("[", myName, "] ",
-    "Number of 1-leniently dispensable: ",
+    "Number of 2-leniently dispensable (haplotype-based): ",
     dtPanFeatsGns[, sum(Ν_pres < c(nHaplos - 2)
                         & 1 < Ν_pres)],
     "\n", sep = "")
 ### private
 cat("[", myName, "] ",
-    "Number of private genes: ", dtPanFeatsGns[, sum(Ν_pres == 1)],
+    "Number of private genes (haplotype-based): ",
+    dtPanFeatsGns[, sum(Ν_pres == 1)],
     "\n", sep = "")
 
-## decomposition of the features in each sub-block ----------------------------
+## decomposition of the features in each sub-block (haplotype-based) ----------
 
 ### count how many features are present in a sub-block with gregexpr
 ### and using integers only (e.g. 1L), although it does not work with empty 
@@ -385,3 +425,9 @@ fwrite(file = pathCountSblocsRegs, x = dtCounts, sep = "\t",
 
 cvSbloc <- sd(dtCounts[, N_sblocks]) / mean(dtCounts[, N_sblocks])
 cvRegis <- sd(dtCounts[, N_regions]) / mean(dtCounts[, N_regions])
+
+## core and dispensable sub-blocks statistics (genome-based) ------------------
+
+dtTmp <- dtPanFeatsGns[, .SD, .SDcols = c(1:2, indHapCols)]
+addColPref(dtTmp, indHapCols)
+repNAwithEmptyChar(dtTmp)
