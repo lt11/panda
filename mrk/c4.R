@@ -17,9 +17,9 @@ library(scriptName)
 #' @return An integer representing the number of non-NA values in `x`.
 #' @examples
 #' # example usage:
-#' CountNoNa(c(1, 2, NA, 4, NA))    # Returns 3
-#' CountNoNa(c("A", "B", NA, "D"))  # Returns 3
-#' CountNoNa(c(TRUE, NA, NA, TRUE)) # Returns 2
+#' CountNoNa(c(1, 2, NA, 4, NA))    # returns 3
+#' CountNoNa(c("A", "B", NA, "D"))  # returns 3
+#' CountNoNa(c(TRUE, NA, NA, TRUE)) # returns 2
 #' @export
 CountNoNa <- function(x) {
   sum(!is.na(x))
@@ -41,9 +41,9 @@ CountNoNa <- function(x) {
 #'         non-NA values by semicolons.
 #' @examples
 #' # example usage:
-#' CountSemicSep(c("A;B;C", "D;E", NA, "F")) # Returns 6 (3+2+1)
-#' CountSemicSep(c(NA, "X;Y;Z", "P;Q", ""))  # Returns 5 (3+2+0)
-#' CountSemicSep(c(NA, NA))                  # Returns 0
+#' CountSemicSep(c("A;B;C", "D;E", NA, "F")) # returns 6 (3+2+1)
+#' CountSemicSep(c(NA, "X;Y;Z", "P;Q", ""))  # returns 5 (3+2+0)
+#' CountSemicSep(c(NA, NA))                  # returns 0
 #' @export
 CountSemicSep <- function(x) {
   sum(lengths(strsplit(x[!is.na(x)], ";")))
@@ -64,9 +64,9 @@ CountSemicSep <- function(x) {
 #'         in the corresponding element of `x`.
 #' @examples
 #' # example usage:
-#' CountAnyFeat(c("A,B,C", "D,E", NA, "F")) # Returns c(3, 2, NA, 1)
-#' CountAnyFeat(c("X,Y,Z", "P,Q", "R", "")) # Returns c(3, 2, 1, 1)
-#' CountAnyFeat(c(NA, NA, "A,B"))           # Returns c(NA, NA, 2)
+#' CountAnyFeat(c("A,B,C", "D,E", NA, "F")) # returns c(3, 2, NA, 1)
+#' CountAnyFeat(c("X,Y,Z", "P,Q", "R", "")) # returns c(3, 2, 1, 1)
+#' CountAnyFeat(c(NA, NA, "A,B"))           # returns c(NA, NA, 2)
 #' @export
 CountAnyFeat <- function(x) {
   z <- sapply(gregexpr(",", x),
