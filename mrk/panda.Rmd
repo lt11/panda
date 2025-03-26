@@ -1025,17 +1025,17 @@ cat("[", myName, "] ",
     nSys,
     "\n", sep = "")
 
-nUnl <- nrow(dtPanFeatsGns[grep(ptnSys, Features_id, invert = T)])
-cat("[", myName, "] ",
-    "Number of sub-blocks with random label(s): ",
-    nUnl,
-    "\n", sep = "")
-
 nLabellable <- nrow(dtPanFeatsGns[grepl(ptnSys, Features_id)
                                   & grepl(ptnRid, Features_id)])
 cat("[", myName, "] ",
     "Number of sub-blocks with at least one labellable feature: ",
     nLabellable,
+    "\n", sep = "")
+
+nUnl <- nrow(dtPanFeatsGns[grep(ptnSys, Features_id, invert = T)])
+cat("[", myName, "] ",
+    "Number of sub-blocks with only random label(s): ",
+    nUnl,
     "\n", sep = "")
 
 ## presence (haplotype-based) -------------------------------------------------
@@ -1050,17 +1050,17 @@ dtPanFeatsGns[, F_pres := c(Ν_pres / nHaplos) ]
 
 ### all core
 cat("[", myName, "] ",
-    "Number of (haplotype-based) core genes: ",
+    "Number of core genes (haplotype-based): ",
     dtPanFeatsGns[, sum(F_pres == 1)],
     "\n", sep = "")
 ### all but one core
 cat("[", myName, "] ",
-    "Number of N-1 (haplotype-based) core genes: ",
+    "Number of N-1 core genes (haplotype-based): ",
     dtPanFeatsGns[, sum(Ν_pres >= c(nHaplos - 1))],
     "\n", sep = "")
 ### all but two core
 cat("[", myName, "] ",
-    "Number of N-2 (haplotype-based) core genes: ",
+    "Number of N-2 core genes (haplotype-based): ",
     dtPanFeatsGns[, sum(Ν_pres >= c(nHaplos - 2))],
     "\n", sep = "")
 ### strictly dispensable: 1 ≤ N presence < all
@@ -1068,21 +1068,21 @@ cat("[", myName, "] ",
     "Number of strictly dispensable genes (haplotype-based): ",
     dtPanFeatsGns[, sum(Ν_pres < nHaplos)],
     "\n", sep = "")
-### moderately dispensable: 1 < N presence < all
+### common dispensable: 1 < N presence < all
 cat("[", myName, "] ",
-    "Number of moderately dispensable (haplotype-based): ",
+    "Number of common dispensable (haplotype-based): ",
     dtPanFeatsGns[, sum(Ν_pres < nHaplos
                         & 1 < Ν_pres)],
     "\n", sep = "")
-### 1-leniently dispensable: 1 < N presence < all - 1
+### 1-leniently common dispensable: 1 < N presence < all - 1
 cat("[", myName, "] ",
-    "Number of 1-leniently dispensable (haplotype-based): ",
+    "Number of 1-leniently common dispensable (haplotype-based): ",
     dtPanFeatsGns[, sum(Ν_pres < c(nHaplos - 1)
                         & 1 < Ν_pres)],
     "\n", sep = "")
-### 2-leniently dispensable: 1 < N presence < all - 2
+### 2-leniently common dispensable: 1 < N presence < all - 2
 cat("[", myName, "] ",
-    "Number of 2-leniently dispensable (haplotype-based): ",
+    "Number of 2-leniently common dispensable (haplotype-based): ",
     dtPanFeatsGns[, sum(Ν_pres < c(nHaplos - 2)
                         & 1 < Ν_pres)],
     "\n", sep = "")
@@ -1193,17 +1193,17 @@ dtPanFeatsGnsGnm[, F_pres := c(Ν_pres / nGenomes) ]
 
 ### all core
 cat("[", myName, "] ",
-    "Number of (genome-based) core genes: ",
+    "Number of core genes (genome-based): ",
     dtPanFeatsGnsGnm[, sum(F_pres == 1)],
     "\n", sep = "")
 ### all but one core
 cat("[", myName, "] ",
-    "Number of N-1 (genome-based) core genes: ",
+    "Number of N-1 core genes (genome-based): ",
     dtPanFeatsGnsGnm[, sum(Ν_pres >= c(nGenomes - 1))],
     "\n", sep = "")
 ### all but two core
 cat("[", myName, "] ",
-    "Number of N-2 (genome-based) core genes: ",
+    "Number of N-2 core genes (genome-based): ",
     dtPanFeatsGnsGnm[, sum(Ν_pres >= c(nGenomes - 2))],
     "\n", sep = "")
 ### strictly dispensable: 1 ≤ N presence < all
@@ -1211,21 +1211,21 @@ cat("[", myName, "] ",
     "Number of strictly dispensable genes (genome-based): ",
     dtPanFeatsGnsGnm[, sum(Ν_pres < nGenomes)],
     "\n", sep = "")
-### moderately dispensable: 1 < N presence < all
+### common dispensable: 1 < N presence < all
 cat("[", myName, "] ",
-    "Number of moderately dispensable (genome-based): ",
+    "Number of common dispensable (genome-based): ",
     dtPanFeatsGnsGnm[, sum(Ν_pres < nGenomes
                            & 1 < Ν_pres)],
     "\n", sep = "")
-### 1-leniently dispensable: 1 < N presence < all - 1
+### 1-leniently common dispensable: 1 < N presence < all - 1
 cat("[", myName, "] ",
-    "Number of 1-leniently dispensable (genome-based): ",
+    "Number of 1-leniently common dispensable (genome-based): ",
     dtPanFeatsGnsGnm[, sum(Ν_pres < c(nGenomes - 1)
                            & 1 < Ν_pres)],
     "\n", sep = "")
-### 2-leniently dispensable: 1 < N presence < all - 2
+### 2-leniently common dispensable: 1 < N presence < all - 2
 cat("[", myName, "] ",
-    "Number of 2-leniently dispensable (genome-based): ",
+    "Number of 2-leniently common dispensable (genome-based): ",
     dtPanFeatsGnsGnm[, sum(Ν_pres < c(nGenomes - 2)
                            & 1 < Ν_pres)],
     "\n", sep = "")
@@ -1244,7 +1244,20 @@ dtPanFeatsGnsGnm[, N_feats := CountAnyFeat(Features_id)]
 dtPanFeatsGnsGnm[, N_feats_sys := CountSysFeat(Features_id)]
 dtPanFeatsGnsGnm[, N_feats_rid := CountRidFeat(Features_id)]
 
-### save dtPanFeatsGnsGnmGnm with counts
+### all core systematic: must be equal to all core
+cat("[", myName, "] ",
+    "Number of core systematic sub-blocks (genome-based): ",
+    dtPanFeatsGnsGnm[, sum(F_pres == 1
+                           & N_feats_sys != 0)],
+    "\n", sep = "")
+### strictly dispensable systematic: 1 ≤ N presence < all
+cat("[", myName, "] ",
+    "Number of strictly dispensable systematic sub-blocks (genome-based): ",
+    dtPanFeatsGnsGnm[, sum(Ν_pres < nGenomes
+                           & N_feats_sys != 0)],
+    "\n", sep = "")
+
+### save dtPanFeatsGnsGnm with counts
 fwrite(file = pathPanGenesGenomes, x = dtPanFeatsGnsGnm, sep = "\t",
        row.names = F, col.names = T)
 
