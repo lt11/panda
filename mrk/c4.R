@@ -276,13 +276,13 @@ strSblock <- "gene"
 dirBase <- dirname(this.dir())
 
 ### output
-dirOut <- file.path(dirBase, "sts")
+dirOut <- file.path(dirBase, "sts", strSblock)
 unlink(dirOut, recursive = T)
 dir.create(dirOut, recursive = T)
-pathPanGenesHaplo <- file.path(dirOut, "sts-genes-haplos.txt")
-pathNorefPriv <- file.path(dirOut, "n-noref-priv.txt")
+pathPanGenesHaplo <- file.path(dirOut, "sts-by-haplos.txt")
+pathNorefPriv <- file.path(dirOut, "n-rid-private.txt")
 pathCountSblocsRegs <- file.path(dirOut, "n-sblocks-regs.txt")
-pathPanGenesGenomes <- file.path(dirOut, "sts-genes-genomes.txt")
+pathPanGenesGenomes <- file.path(dirOut, "sts-by-genomes.txt")
 
 ## clmnt ----------------------------------------------------------------------
 
