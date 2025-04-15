@@ -685,6 +685,8 @@ save(dtPanFeats, file = file.path(dirOut, "pan-features.RData"))
 Here, we run the statistics on one type of sub-blocks, the genes.
 
 ```{r makes the statistics on one type of sub-blocks}
+## header ---------------------------------------------------------------------
+
 options(scipen = 999)
 options(stringsAsFactors = F)
 rm(list = ls())
