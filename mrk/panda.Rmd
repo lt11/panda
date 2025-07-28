@@ -310,8 +310,8 @@ library(tictoc)
 
 #' Split and Extract a Specific Sub-Column from a Character Column
 #'
-#' This function splits a character column using a specified delimiter and extracts
-#' the desired sub-column based on the given index.
+#' This function splits a character column using a specified delimiter 
+#' and extracts the desired sub-column based on the given index.
 #'
 #' @param x A character vector, typically a column from a data table.
 #' @param n An integer specifying the index of the sub-column 
