@@ -950,6 +950,49 @@ replaceEmptyToNA <- function(x, y = F) {
   return(x)
 }
 
+library(data.table)
+
+#' Filter intervals in a semicolon-separated genomic string based on a list
+#' of valid ("kept") intervals.
+#'
+#' @param cell A character string of the form "chr:start-end;chr:start-end;..."
+#'             or NA.
+#' @param regs A character vector of intervals to retain, in the
+#'             same "chr:start-end" format.
+#'
+#' @return A semicolon-separated string of intervals found in both the cell
+#'         and the kept list, or NA if none match.
+#' @examples
+#' dtRegions <- data.table(
+#' "Class_id" = c("gene", "gene", "gene", "gene", "gene"),
+#' "Features_id" = c("anello", "del", "conte", "antani", "sblinda"),
+#' "SGDref#0" = c(
+#'   "chrVII:9161-9695",
+#'   "chrVII:9518-9751",
+#'   NA,
+#'   "chrXIV:1375-2528;chrXIV:36539-36694;chrIV_chrII:36539-37694",
+#'   "chrX:1000-1010;chrX:1200-1800"),
+#' "BUCIO#1" = c(
+#'   "chrV:9161-9295",
+#'   NA,
+#'   NA,
+#'   NA,
+#'   "chrX:1000-2010;chrX:1200-1800"),
+#' "DECULO#2" = c(
+#'   "chrV:9161-9895",
+#'   NA,
+#'   NA,
+#'   NA,
+#'   NA)
+#' )
+FilterCellByKeptIntervals <- function(cell, reg) {
+  if (is.na(cell)) return(NA_character_)
+  allParts <- unlist(strsplit(cell, ";", fixed = T))
+  intvKept <- allParts[allParts %in% reg]
+  if (length(intvKept) == 0) return(NA_character_)
+  paste(intvKept, collapse = ";")
+}
+
 ## settings -------------------------------------------------------------------
 
 ### reference genome
@@ -992,7 +1035,7 @@ dtBedRefGns <- dtBedRef[grep("^gene", Class_feat_strand)]
 # pathInGrt <- file.path(dirBase, "png", "generators.txt")
 # dtGrt <- fread(file = pathInGrt,
 #                sep = ":", header = T)
-# dtGrt[, c("Feature_id", "Strand_id") := 
+# dtGrt[, c("Features_id", "Strand_id") := 
 #         tstrsplit(.SD[[which(colnames(dtGrt) == "feature#strand")]], "#")]
 # setnames(dtGrt, old = which(colnames(dtGrt) == "class"), new = "Class_id")
 
@@ -1006,9 +1049,54 @@ load(pathInPan)
 nHaplos <- ncol(dtPanFeats) - 2
 indHapCols <- 3:ncol(dtPanFeats)
 
+## filter sub-blocks by regions length ----------------------------------------
+
+dtPanFeatsRaw <- dtPanFeats[Class_id == strSblock]
+
+### columns with genomic intervals
+intervalCols <- setdiff(names(dtPanFeatsRaw), c("Class_id", "Features_id"))
+
+### process each row independently
+dtPanFeatsGns <- dtPanFeatsRaw[, {
+  ### extract all intervals in this row across all genomic columns
+  allIntervals <- unlist(tstrsplit(unlist(.SD), ";", fixed = T))
+  allIntervals <- allIntervals[!is.na(allIntervals) & grepl(":", allIntervals)]
+  
+  if (length(allIntervals) == 0) {
+    ### if there are no valid intervals
+    outCols <- lapply(.SD, function(x) NA_character_)
+  } else {
+    ### calculate interval lengths
+    intervalCoords <- tstrsplit(gsub(".*:", "", allIntervals), "-", fixed = T)
+    intervalStarts <- as.numeric(intervalCoords[[1]])
+    intervalEnds <- as.numeric(intervalCoords[[2]])
+    intervalLengths <- intervalEnds - intervalStarts
+    
+    ### compute median
+    M <- median(intervalLengths, na.rm = T)
+    
+    ### identify good intervals (length ≥ 0.5 * M)
+    indBon <- which(intervalLengths >= 0.5 * M)
+    intervalsBon <- allIntervals[indBon]
+    
+    ### rebuild each genomic column using helper function
+    outCols <- lapply(.SD, FilterCellByKeptIntervals,
+                      reg = intervalsBon)
+  }
+  
+  ### return Class_id and Features_id along with filtered columns
+  c(list(Class_id = Class_id, Features_id = Features_id), outCols)
+}, by = seq(1:nrow(dtPanFeatsRaw)), .SDcols = intervalCols]
+
+### clean up row index
+dtPanFeatsGns[, seq := NULL]
+
+### garbage collection
+rm(dtPanFeatsRaw)
+invisible(gc())
+
 ## sub-blocks statistics ------------------------------------------------------
 
-dtPanFeatsGns <- dtPanFeats[Class_id == strSblock]
 cat("[", myName, "] ",
     "Counting on sub-blocks labelled as: ",
     strSblock,
