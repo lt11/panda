@@ -371,9 +371,10 @@ intervalCols <- setdiff(names(dtPanFeatsRaw), c("Class_id", "Features_id"))
 
 ### process each row independently
 dtPanFeatsGns <- dtPanFeatsRaw[, {
-  ### extract all intervals in this row across all genomic columns
+  ### extract all intervals in one row across all genomic columns
   allIntervals <- unlist(tstrsplit(unlist(.SD), ";", fixed = T))
-  allIntervals <- allIntervals[!is.na(allIntervals) & grepl(":", allIntervals)]
+  allIntervals <- allIntervals[!is.na(allIntervals)
+                               & grepl(":", allIntervals)]
   
   if (length(allIntervals) == 0) {
     ### if there are no valid intervals
@@ -392,7 +393,7 @@ dtPanFeatsGns <- dtPanFeatsRaw[, {
     indBon <- which(intervalLengths >= 0.5 * M)
     intervalsBon <- allIntervals[indBon]
     
-    ### rebuild each genomic column using helper function
+    ### rebuild each genomic column
     outCols <- lapply(.SD, FilterCellByKeptIntervals,
                       reg = intervalsBon)
   }
