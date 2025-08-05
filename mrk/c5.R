@@ -185,8 +185,7 @@ if (!exists("dtPanFeatsGns")) {
   dtPanFeatsGns <- fread(pathPanGenesHaplo)
 }
 
-### dev 
-dtPanFeatsGns <- dtPanFeatsGns[1:100, ]
+### dev dtPanFeatsGns <- dtPanFeatsGns[1:100, ]
 
 ### read essential non-evolvable (esne) genes
 dtEsse <- fread(pathEsse, sep = "\t", col.names = c("Gene_id", "Gene_type"))
