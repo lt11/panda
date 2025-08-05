@@ -1,7 +1,8 @@
 ## header ---------------------------------------------------------------------
 
-### This script requires "samtools faidx". Given: a list of "essential" genes, a folder with the genomes used to 
-### build the graph, and the corresponding pangenome, here we extract 
+### This script requires "samtools faidx". Given: a list of "essential" genes, 
+### a folder with the genomes used to build the graph, 
+### and the corresponding pangenome, here we extract 
 ### the sequence encoded in each element or semicolon delimited sub-element 
 ### of the pangenome table (dtPanFeatsGns) from the corresponding FASTA file.
 ### We verify that: (1) the sequence starts with a START codon, 
@@ -184,7 +185,8 @@ if (!exists("dtPanFeatsGns")) {
   dtPanFeatsGns <- fread(pathPanGenesHaplo)
 }
 
-### dev dtPanFeatsGns <- dtPanFeatsGns[1:100, ]
+### dev 
+dtPanFeatsGns <- dtPanFeatsGns[1:100, ]
 
 ### read essential non-evolvable (esne) genes
 dtEsse <- fread(pathEsse, sep = "\t", col.names = c("Gene_id", "Gene_type"))
@@ -222,6 +224,7 @@ for (indR in seq(1:nrow(dtPanFeatsGns))) {
     ### dev oneInterval <- allIntervals[1]
     for (oneInterval in allIntervals) {
       if (is.na(oneInterval) || oneInterval == "") next
+      origInterval <- oneInterval
       oneInterval <- ZeroToOneBased(oneInterval)
       lsRow$N_total <- lsRow$N_total + 1
       strGenome <- paste0(sub("#", "-", oneCol), "-genome.fa.gz$")
@@ -250,18 +253,15 @@ for (indR in seq(1:nrow(dtPanFeatsGns))) {
           cat(sprintf(">%s\n%s\n", hdFastaRevComp, strSeqRevComp),
               file = pathSblockFa, append = T)
         } else {
-          invInterval <- paste0("inv#", oneInterval)
-          lsRow[[oneCol]] <- gsub(oneInterval, invInterval,
+          invInterval <- paste0("inv#", origInterval)
+          lsRow[[oneCol]] <- gsub(origInterval, invInterval,
                                   lsRow[[oneCol]], fixed = T)
           lsRow$N_invalid <- lsRow$N_invalid + 1
         }
       }
     }
   }
-  dtPanFeatsGns[indR,
-                c("N_total", "N_invalid") := list(
-                  lsRow$N_total,
-                  lsRow$N_invalid)]
+  dtPanFeatsGns[indR, names(lsRow) := lsRow]
 }
 
 ### save dtPanFeatsGns with class annotation (e.g. core) and invalid counts
