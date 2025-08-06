@@ -177,7 +177,7 @@ CountRidFeat <- function(x) {
 #' indHapCols <- c(2, 3)
 #'
 #' # apply the function
-#' addColPref(dt, indHapCols)
+#' AddColPref(dt, indHapCols)
 #'
 #' # expected output:
 #' #     ID   SGD#0                                        AAB#1
@@ -186,7 +186,7 @@ CountRidFeat <- function(x) {
 #' # 3:  3    NA (unchanged)                               AAB#1#chrXII:99-111
 #'
 #' @export
-addColPref <- function(x, y) {
+AddColPref <- function(x, y) {
   x[, (y) := lapply(y, function(indC) {
     col_name <- names(x)[indC]
     ifelse(!is.na(x[[indC]]),
@@ -213,9 +213,9 @@ addColPref <- function(x, y) {
 #' @examples
 #' library(data.table)
 #' x <- data.table(A = c("apple", NA), B = c(NA, "orange"), C = c(1, NA))
-#' replaceNAtoEmpty(x)         # only character columns
-#' replaceNAtoEmpty(x, TRUE)   # all columns, coerced to character
-replaceNAtoEmpty <- function(x, y = F) {
+#' ReplaceNAtoEmpty(x)         # only character columns
+#' ReplaceNAtoEmpty(x, TRUE)   # all columns, coerced to character
+ReplaceNAtoEmpty <- function(x, y = F) {
   if (!data.table::is.data.table(x)) {
     ### stop prints "Error: " by default
     stop("input must be a data.table.")
@@ -246,9 +246,9 @@ replaceNAtoEmpty <- function(x, y = F) {
 #' @examples
 #' library(data.table)
 #' x <- data.table(A = c("apple", ""), B = c("", "orange"), C = c("1", ""))
-#' replaceEmptyToNA(x)         # only character columns
-#' replaceEmptyToNA(x, TRUE)   # all columns, coerced to character
-replaceEmptyToNA <- function(x, y = F) {
+#' ReplaceEmptyToNA(x)         # only character columns
+#' ReplaceEmptyToNA(x, TRUE)   # all columns, coerced to character
+ReplaceEmptyToNA <- function(x, y = F) {
   if (!data.table::is.data.table(x)) {
     stop("input must be a data.table.")
   }
@@ -550,8 +550,8 @@ cvRegis <- sd(dtCounts[, N_regions]) / mean(dtCounts[, N_regions])
 ## collapse haplotypes into genomes ------------------------------------------
 
 dtTmp <- dtPanFeatsGns[, .SD, .SDcols = c(1:2, indHapCols)]
-addColPref(dtTmp, indHapCols)
-replaceNAtoEmpty(dtTmp)
+AddColPref(dtTmp, indHapCols)
+ReplaceNAtoEmpty(dtTmp)
 ### remove numeric suffix
 vtGnmIds <- gsub("#[0-9]+$", "", names(dtTmp)[indHapCols])
 ### change column names and identify unique indPes
@@ -573,7 +573,7 @@ for (indP in vtGnmIdsUniq) {
     dtPanFeatsGnsGnm[, (indP) := dtTmp[[vtColMatched]]]
   }
 }
-replaceEmptyToNA(dtPanFeatsGnsGnm)
+ReplaceEmptyToNA(dtPanFeatsGnsGnm)
 
 ### garbage collection
 rm(dtTmp)
