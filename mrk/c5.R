@@ -41,7 +41,7 @@ library(Biostrings)
 #' FASTA header line.
 #'
 #' @param x A character string specifying 
-#'          the path to the FASTA file (e.g., `"genome.fa.gz"`).
+#'          the path to the FASTA file (e.g., `"SGDref-genome.fa.gz"`).
 #' @param y A character string specifying the genomic region 
 #'          in samtools format (e.g., `"chrIV:0-200"`).
 #'
@@ -64,9 +64,8 @@ GetSequence <- function(x, y) {
   cmd <- sprintf("samtools faidx %s '%s'", shQuote(x), y)
   res <- system(cmd, intern = TRUE)
   if (length(res) <= 1) return(NA)
-  paste(res[-1], collapse = "")
-  ### return the sequence but not the header
-  return(res[2])
+  ### remove header and collapse the lines
+  return(paste(res[-1], collapse = ""))
 }
 
 #' Check if a DNA sequence is a valid protein-coding sequence
@@ -206,7 +205,7 @@ dtPanFeatsGns[, Sblock_type := fifelse(
 ### process each row
 dtPanFeatsGns[, c("N_total", "N_invalid") := .(0, 0)]
 
-### dev indR <- 1
+### dev indR <- 95
 for (indR in seq(1:nrow(dtPanFeatsGns))) {
   lsRow <- dtPanFeatsGns[indR]
   firstFeat <- sub(",.*", "", lsRow$Features_id)
@@ -214,7 +213,7 @@ for (indR in seq(1:nrow(dtPanFeatsGns))) {
                             paste0(lsRow$Sblock_type, "-", firstFeat, ".fa"))
   bonCols <- setdiff(names(lsRow), skippedCols)
   
-  ### dev oneCol <- bonCols[5]
+  ### dev oneCol <- bonCols[1]
   for (oneCol in bonCols) {
     if (!grepl("#", oneCol)) next
     allIntervals <- unlist(strsplit(lsRow[[oneCol]], ";"))
