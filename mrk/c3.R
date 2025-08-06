@@ -147,8 +147,6 @@ dtImpgAll[, Query_len := Query_end - Query_start]
 
 ## overlap size filter --------------------------------------------------------
 
-length(which(dtImpgAll$Query_len > dtImpgAll$Target_len))
-
 ### size filter
 dtImpgAllSzFlt <- dtImpgAll[Target_len > sizeLim
                             & Query_len > sizeLim]

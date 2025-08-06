@@ -444,8 +444,6 @@ dtImpgAll[, Query_len := Query_end - Query_start]
 
 ## overlap size filter --------------------------------------------------------
 
-length(which(dtImpgAll$Query_len > dtImpgAll$Target_len))
-
 ### size filter
 dtImpgAllSzFlt <- dtImpgAll[Target_len > sizeLim
                             & Query_len > sizeLim]
@@ -682,7 +680,7 @@ save(dtPanFeats, file = file.path(dirOut, "pan-features.RData"))
 
 ```
 
-Here, we run the statistics on one type of sub-blocks, the genes.
+Here, we run the statistics on one type of sub-blocks, the genes. The genomic regions (aka the intervals) are filtered by size. Only those larger than half the median interval size of a sub-block are retained.  
 
 ```{r makes the statistics on one type of sub-blocks}
 ## header ---------------------------------------------------------------------
@@ -950,8 +948,6 @@ replaceEmptyToNA <- function(x, y = F) {
   return(x)
 }
 
-library(data.table)
-
 #' Filter intervals in a semicolon-separated genomic string based on a list
 #' of valid ("kept") intervals.
 #'
@@ -1049,7 +1045,7 @@ load(pathInPan)
 nHaplos <- ncol(dtPanFeats) - 2
 indHapCols <- 3:ncol(dtPanFeats)
 
-## filter sub-blocks by regions length ----------------------------------------
+## filter sub-blocks by regions size ------------------------------------------
 
 dtPanFeatsRaw <- dtPanFeats[Class_id == strSblock]
 
@@ -1078,11 +1074,11 @@ dtPanFeatsGns <- dtPanFeatsRaw[, {
     
     ### identify good intervals (length ≥ 0.5 * M)
     indBon <- which(intervalLengths >= 0.5 * M)
-    intervalsBon <- allIntervals[indBon]
+    bonIntervals <- allIntervals[indBon]
     
     ### rebuild each genomic column
     outCols <- lapply(.SD, FilterCellByKeptIntervals,
-                      reg = intervalsBon)
+                      reg = bonIntervals)
   }
   
   ### return Class_id and Features_id along with filtered columns

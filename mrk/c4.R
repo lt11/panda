@@ -1,4 +1,3 @@
-## header ---------------------------------------------------------------------
 
 options(scipen = 999)
 options(stringsAsFactors = F)
@@ -263,8 +262,6 @@ replaceEmptyToNA <- function(x, y = F) {
   return(x)
 }
 
-library(data.table)
-
 #' Filter intervals in a semicolon-separated genomic string based on a list
 #' of valid ("kept") intervals.
 #'
@@ -362,7 +359,7 @@ load(pathInPan)
 nHaplos <- ncol(dtPanFeats) - 2
 indHapCols <- 3:ncol(dtPanFeats)
 
-## filter sub-blocks by regions length ----------------------------------------
+## filter sub-blocks by regions size ------------------------------------------
 
 dtPanFeatsRaw <- dtPanFeats[Class_id == strSblock]
 
@@ -391,11 +388,11 @@ dtPanFeatsGns <- dtPanFeatsRaw[, {
     
     ### identify good intervals (length ≥ 0.5 * M)
     indBon <- which(intervalLengths >= 0.5 * M)
-    intervalsBon <- allIntervals[indBon]
+    bonIntervals <- allIntervals[indBon]
     
     ### rebuild each genomic column
     outCols <- lapply(.SD, FilterCellByKeptIntervals,
-                      reg = intervalsBon)
+                      reg = bonIntervals)
   }
   
   ### return Class_id and Features_id along with filtered columns
@@ -589,7 +586,7 @@ indGnmCols <- 3:ncol(dtPanFeatsGnsGnm)
 
 ### number of genomes with at least one region in the sub-block
 dtPanFeatsGnsGnm[, Ν_pres := rowSums(!is.na(as.matrix(.SD))),
-              .SDcols = indGnmCols]
+                 .SDcols = indGnmCols]
 ### fraction of genomes with at least one region in the sub-block
 dtPanFeatsGnsGnm[, F_pres := c(Ν_pres / nGenomes) ]
 
