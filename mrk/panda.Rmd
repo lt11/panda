@@ -5,7 +5,7 @@ date: "`r Sys.Date()`"
 ### html documents may cause problems on Hulk (knit fails)
 ### while pdf documents may casue problems on macOS 
 ### (latex fails to compile the tex file of the markdown) 
-output: pdf_document
+output: html_document
 ---
 
 ## Warning Messages
@@ -24,7 +24,7 @@ Retrieve the sequences of each block and save them? Probably this is not a wise 
 
 ## Input Files and Formats
 
-The input files are: 1) an alignment, 2) the annotations (with unique identifiers) of the contigs aligned.
+The input files are: 1) an alignment (e.g. "../aln/sc-phhd-1.paf"), 2) the annotations of the contigs aligned (e.g. as in "/.../data/nano-assemblies-pansn-2024") named in pansn format but with data in classic format, 3) their unique identifiers (e.g. "../ids/ids-ps.txt")
 
 The alignment file is in paf format. The delimiter (see https://github.com/pangenome/PanSN-spec) is "#". The annotations are in gff format. The file are named using the "-" separator. E.g. in the alignment we may have in line 1 and column 1: "SGDref#0#chrI". The corresponding annotations file is named "SGDref-0-features.gff" and it reports all the annotations for all the corresponding contigs.
 
@@ -100,10 +100,11 @@ library(scriptName)
 
 ### fixed settings
 dirBase <- dirname(this.dir())
-dirAnnoGff <- file.path(dirBase, "anno", "gff")
+dirAnnoGff <- file.path(Sys.getenv("HOME"), "data",
+                        "nano-assemblies-pansn-2024", "annotations", "nuclear")
 dirOut <- file.path(dirBase, "anno", "bed")
 unlink(dirOut, recursive = T)
-dir.create(dirOut, showWarnings = F)
+dir.create(dirOut, recursive = T, showWarnings = F)
 idRef <- "SGDref"
 hdGff <- c("Chr_id", "Strain_id", "Feat_type", "S_coord",
            "E_coord", "S_val", "Strand_id", "Frame_id", "Attribute_str")

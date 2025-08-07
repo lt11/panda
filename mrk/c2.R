@@ -11,10 +11,11 @@ library(scriptName)
 
 ### fixed settings
 dirBase <- dirname(this.dir())
-dirAnnoGff <- file.path(dirBase, "anno", "gff")
+dirAnnoGff <- file.path(Sys.getenv("HOME"), "data",
+                        "nano-assemblies-pansn-2024", "annotations", "nuclear")
 dirOut <- file.path(dirBase, "anno", "bed")
 unlink(dirOut, recursive = T)
-dir.create(dirOut, showWarnings = F)
+dir.create(dirOut, recursive = T, showWarnings = F)
 idRef <- "SGDref"
 hdGff <- c("Chr_id", "Strain_id", "Feat_type", "S_coord",
            "E_coord", "S_val", "Strand_id", "Frame_id", "Attribute_str")
