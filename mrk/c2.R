@@ -126,10 +126,10 @@ for (indR in vtRef) {
   strName <- paste0(dtGff[, Feat_type], ":",
                     strFeatIdTrm, "#", dtGff[, Strand_id])
   ### transform the gff into a bed file
-  dtBed <- data.table(chrom = paste0(strIdPref, dtGff[, Chr_id]),
-                      chromStart = dtGff[, S_coord],
-                      chromEnd = dtGff[, E_coord],
-                      name = strName)
+  dtBed <- data.table(Chrom_id = paste0(strIdPref, dtGff[, Chr_id]),
+                      Chrom_start = dtGff[, S_coord],
+                      Chrom_end = dtGff[, E_coord],
+                      Class_feat = strName)
   ### write the bed file
   nameOut <- sub(pattern = "-features.gff$", replacement = ".bed",
                  x = basename(pathAnnoGff))
@@ -181,9 +181,9 @@ for (indS in vtStrainHaplo) {
   ### transform the gff into a bed file
   ### and filter out genes with a systematic name
   dtBed <- data.table(chrom = paste0(strIdPref, dtGff[indSys, Chr_id]),
-                      chromStart = dtGff[indSys, S_coord],
-                      chromEnd = dtGff[indSys, E_coord],
-                      name = strName[indSys])
+                      Chrom_start = dtGff[indSys, S_coord],
+                      Chrom_end = dtGff[indSys, E_coord],
+                      Class_feat = strName[indSys])
   ### write the bed file
   nameOut <- sub(pattern = "-features.gff$", replacement = ".bed",
                  x = basename(pathAnnoGff))
