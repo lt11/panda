@@ -91,6 +91,7 @@ vtRef <- grep(idRef, vtStrainHaplo, value = T)
 ### remove the reference
 vtStrainHaplo <- grep(idRef, vtStrainHaplo, value = T, invert = T)
 
+### dev indR <- vtRef[1]
 ### loop for reference annotations
 for (indR in vtRef) {
   ### read the gff
@@ -115,11 +116,7 @@ for (indR in vtRef) {
   ### filter features
   dtGff <- dtGff[Feat_type %in% vtClassSrt, ]
   ### make the feature id column
-  strFeatId <- sub("^.*Name=([^;]*).*$", "\\1", dtGff$Attribute_str)
-  ### trim after the first ":", e.g. Name=TY3_soloLTR:chrI:183676-184015:-
-  strFeatIdTrm <- sub("^([^:]*).*$", "\\1", strFeatId)
-  ### trim trailing redundancy, e.g. _intron in YAL003W_intron
-  strFeatIdTrm <- sub("^([^_]*).*$", "\\1", strFeatId)
+  strFeatIdTrm <- sub("^.*Name=([^;]*).*$", "\\1", dtGff$Attribute_str)
   ### if strFeatId = dtGff[, Feat_type] set strFeatId = "MN"
   indM <- which(dtGff[, Feat_type] == strFeatIdTrm)
   if (length(indM) != 0) {
@@ -168,16 +165,12 @@ for (indS in vtStrainHaplo) {
   ### filter features
   dtGff <- dtGff[Feat_type %in% vtClassSrt, ]
   ### make the feature id column
-  strFeatId <- sub("^.*Name=([^;]*).*$", "\\1", dtGff$Attribute_str)
-  ### trim after the first ":", e.g. Name=TY3_soloLTR:chrI:183676-184015:-
-  strFeatIdTrm <- sub("^([^:]*).*$", "\\1", strFeatId)
-  ### trim "tRNA_" from feature id
-  strFeatIdTrm <- sub(pattern = "tRNA_", replacement = "", x = strFeatIdTrm)
+  strFeatIdTrm <- sub("^.*Name=([^;]*).*$", "\\1", dtGff$Attribute_str)
   ### indexes of the rows that do not contain
   ### nuclear gene names with systematic names, e.g. YAL062W
   indSys <- grep(pattern = "^Y[A-P][L,R][0-9]{3}[W,C]",
                  x = strFeatIdTrm, value = F, invert = T)
-  ### if strFeatId = dtGff[, Feat_type] set strFeatId = "MN"
+  ### if strFeatIdTrm = dtGff[, Feat_type] set strFeatId = "MN"
   indM <- which(dtGff[, Feat_type] == strFeatIdTrm)
   if (length(indM) != 0) {
     strFeatIdTrm[indM] <- "MN"
