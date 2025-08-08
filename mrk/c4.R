@@ -335,21 +335,6 @@ cat("[", myName, "] ",
     "Making the statistics. ",
     "\n", sep = "")
 
-### load SGDref features
-pathBedRef <- file.path(dirBase, "anno", "bed", paste0(idRefHap, ".bed"))
-dtBedRef <- fread(file = pathBedRef, sep = "\t", header = F)
-names(dtBedRef) <- c("Strain_hap_chr", "S_coord",
-                     "E_coord", "Class_feat_strand")
-dtBedRefGns <- dtBedRef[strSblock, Class_feat_strand)]
-
-# ### load the generators
-# pathInGrt <- file.path(dirBase, "png", "generators.txt")
-# dtGrt <- fread(file = pathInGrt,
-#                sep = ":", header = T)
-# dtGrt[, c("Features_id", "Strand_id") := 
-#         tstrsplit(.SD[[which(colnames(dtGrt) == "feature#strand")]], "#")]
-# setnames(dtGrt, old = which(colnames(dtGrt) == "class"), new = "Class_id")
-
 ### load the pangenome (dtPanFeats)
 pathInPan <- file.path(dirBase, "png", "pan-features.RData")
 load(pathInPan)
