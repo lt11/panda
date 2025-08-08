@@ -340,7 +340,7 @@ pathBedRef <- file.path(dirBase, "anno", "bed", paste0(idRefHap, ".bed"))
 dtBedRef <- fread(file = pathBedRef, sep = "\t", header = F)
 names(dtBedRef) <- c("Strain_hap_chr", "S_coord",
                      "E_coord", "Class_feat_strand")
-dtBedRefGns <- dtBedRef[grep("^gene", Class_feat_strand)]
+dtBedRefGns <- dtBedRef[strSblock, Class_feat_strand)]
 
 # ### load the generators
 # pathInGrt <- file.path(dirBase, "png", "generators.txt")
