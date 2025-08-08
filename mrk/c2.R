@@ -123,13 +123,13 @@ for (indR in vtRef) {
     strFeatIdTrm[indM] <- "MN"
   }
   ### paste class and feature id (and the strand)
-  strName <- paste0(dtGff[, Feat_type], ":",
-                    strFeatIdTrm, "#", dtGff[, Strand_id])
+  strClassIdStrand <- paste0(dtGff[, Feat_type], ":",
+                             strFeatIdTrm, "#", dtGff[, Strand_id])
   ### transform the gff into a bed file
   dtBed <- data.table(Chrom_id = paste0(strIdPref, dtGff[, Chr_id]),
                       Chrom_start = dtGff[, S_coord],
                       Chrom_end = dtGff[, E_coord],
-                      Class_feat = strName)
+                      Class_feat = strClassIdStrand)
   ### write the bed file
   nameOut <- sub(pattern = "-features.gff$", replacement = ".bed",
                  x = basename(pathAnnoGff))
@@ -168,7 +168,7 @@ for (indS in vtStrainHaplo) {
   strFeatIdTrm <- sub("^.*Name=([^;]*).*$", "\\1", dtGff$Attribute_str)
   ### indexes of the rows that do not contain
   ### nuclear gene names with systematic names, e.g. YAL062W
-  indSys <- grep(pattern = "^Y[A-P][L,R][0-9]{3}[W,C]",
+  indRid <- grep(pattern = "^Y[A-P][L,R][0-9]{3}[W,C]",
                  x = strFeatIdTrm, value = F, invert = T)
   ### if strFeatIdTrm = dtGff[, Feat_type] set strFeatId = "MN"
   indM <- which(dtGff[, Feat_type] == strFeatIdTrm)
@@ -176,14 +176,14 @@ for (indS in vtStrainHaplo) {
     strFeatIdTrm[indM] <- "MN"
   }
   ### paste class and feature id (and the strand)
-  strName <- paste0(dtGff[, Feat_type], ":",
-                    strFeatIdTrm, "#", dtGff[, Strand_id])
+  strClassIdStrand <- paste0(dtGff[, Feat_type], ":",
+                             strFeatIdTrm, "#", dtGff[, Strand_id])
   ### transform the gff into a bed file
   ### and filter out genes with a systematic name
-  dtBed <- data.table(chrom = paste0(strIdPref, dtGff[indSys, Chr_id]),
-                      Chrom_start = dtGff[indSys, S_coord],
-                      Chrom_end = dtGff[indSys, E_coord],
-                      Class_feat = strName[indSys])
+  dtBed <- data.table(chrom = paste0(strIdPref, dtGff[indRid, Chr_id]),
+                      Chrom_start = dtGff[indRid, S_coord],
+                      Chrom_end = dtGff[indRid, E_coord],
+                      Class_feat = strClassIdStrand[indRid])
   ### write the bed file
   nameOut <- sub(pattern = "-features.gff$", replacement = ".bed",
                  x = basename(pathAnnoGff))
