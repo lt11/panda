@@ -1232,8 +1232,8 @@ AddColPref(dtTmp, indHapCols)
 ReplaceNAtoEmpty(dtTmp)
 ### remove numeric suffix
 vtGnmIds <- gsub("#[0-9]+$", "", names(dtTmp)[indHapCols])
-### change column names and identify unique indPes
-names(dtTmp)[indHapCols] <-  vtGnmIds
+### change column names and identify unique ids
+names(dtTmp)[indHapCols] <- vtGnmIds
 vtGnmIdsUniq <- unique(vtGnmIds)
 
 ### initialize output with genome columns
