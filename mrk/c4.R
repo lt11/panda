@@ -535,7 +535,7 @@ cvRegis <- sd(dtCounts[, N_regions]) / mean(dtCounts[, N_regions])
 
 ## collapse haplotypes into genomes -------------------------------------------
 
-dtTmp <- dtPanFeatsGns[, .SD, .SDcols = c(1:2, indHapCols)]
+dtTmp <- copy(dtPanFeatsGns[, .SD, .SDcols = c(1:2, indHapCols)])
 AddColPref(dtTmp, indHapCols)
 ReplaceNAtoEmpty(dtTmp)
 ### remove numeric suffix
