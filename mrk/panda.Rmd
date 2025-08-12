@@ -676,6 +676,7 @@ save(dtPanFeats, file = file.path(dirOut, "pan-features.RData"))
 Here, we run the statistics on one type of sub-blocks, the genes. The genomic regions (aka the intervals) are filtered by size. Only those larger than half the median interval size of a sub-block are retained.  
 
 ```{r makes the statistics on one type of sub-blocks}
+## header ---------------------------------------------------------------------
 
 options(scipen = 999)
 options(stringsAsFactors = F)
@@ -1012,21 +1013,6 @@ cat("[", myName, "] ",
     "Making the statistics. ",
     "\n", sep = "")
 
-### load SGDref features
-pathBedRef <- file.path(dirBase, "anno", "bed", paste0(idRefHap, ".bed"))
-dtBedRef <- fread(file = pathBedRef, sep = "\t", header = F)
-names(dtBedRef) <- c("Strain_hap_chr", "S_coord",
-                     "E_coord", "Class_feat_strand")
-dtBedRefGns <- dtBedRef[grep("^gene", Class_feat_strand)]
-
-# ### load the generators
-# pathInGrt <- file.path(dirBase, "png", "generators.txt")
-# dtGrt <- fread(file = pathInGrt,
-#                sep = ":", header = T)
-# dtGrt[, c("Features_id", "Strand_id") := 
-#         tstrsplit(.SD[[which(colnames(dtGrt) == "feature#strand")]], "#")]
-# setnames(dtGrt, old = which(colnames(dtGrt) == "class"), new = "Class_id")
-
 ### load the pangenome (dtPanFeats)
 pathInPan <- file.path(dirBase, "png", "pan-features.RData")
 load(pathInPan)
@@ -1227,7 +1213,8 @@ cvRegis <- sd(dtCounts[, N_regions]) / mean(dtCounts[, N_regions])
 
 ## collapse haplotypes into genomes -------------------------------------------
 
-dtTmp <- dtPanFeatsGns[, .SD, .SDcols = c(1:2, indHapCols)]
+### keep dtPanFeatsGns with e.g. chrIV:12-234 instead of S288C#0#chrIV:12-234
+dtTmp <- copy(dtPanFeatsGns[, .SD, .SDcols = c(1:2, indHapCols)])
 AddColPref(dtTmp, indHapCols)
 ReplaceNAtoEmpty(dtTmp)
 ### remove numeric suffix
