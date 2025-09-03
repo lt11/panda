@@ -782,7 +782,7 @@ CountAnyFeat <- function(x) {
 #' @export
 CountSysFeat <- function(x) {
   ### the pattern for systematic yeast gene names
-  ptnSys <- "Y[A-P][L,R][0-9]{3}[W,C]"
+  ptnSys <- "Y[A-P][L,R][0-9]{3}[W,C](-[A-Z])?"
   
   ### apply the regular expression and count occurrences
   y <- sapply(gregexpr(ptnSys, x, perl = T), function(x) sum(x > 0))
@@ -987,7 +987,7 @@ FilterCellByKeptIntervals <- function(cell, reg) {
 ### reference genome
 idRefHap <- "SGDref-0"
 ### pattern of systematic genes
-ptnSys <- "Y[A-P][L,R][0-9]{3}[W,C]"
+ptnSys <- "Y[A-P][L,R][0-9]{3}[W,C](-[A-Z])?"
 ### pattern of random id genes
 ptnRid <- "_G[0-9]{7}"
 ### the type of sub-blocks to process

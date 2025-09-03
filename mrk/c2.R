@@ -102,7 +102,7 @@ for (indR in vtRef) {
   ### id
   strIdPref <- paste0(sub(pattern = "-", replacement = "#", x = indR), "#")
   ### convert the start coordinate from 0-based (gff) to 1-based (bed)
-  dtGff[, S_coord := S_coord - 1]
+  dtGff[, S_coord := S_coord + 1]
   ### check start and end coordinates: if start = end impg breaks
   nBad <- nrow(dtGff[S_coord >= E_coord])
   if (nBad > 0) {
@@ -151,7 +151,7 @@ for (indS in vtStrainHaplo) {
   ### id
   strIdPref <- paste0(sub(pattern = "-", replacement = "#", x = indS), "#")
   ### convert the start coordinate from 0-based (gff) to 1-based (bed)
-  dtGff[, S_coord := S_coord - 1]
+  dtGff[, S_coord := S_coord + 1]
   ### check start and end coordinates: if start = end and impg breaks
   nBad <- nrow(dtGff[S_coord >= E_coord])
   if (nBad > 0) {

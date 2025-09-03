@@ -157,7 +157,7 @@ pathPanGenesHaplo <- file.path(dirBlocks, "sts-by-haplos.txt")
 pathEsse <- file.path(Sys.getenv("HOME"), "data",
                       "SGD-essential-genes", "essentiality.txt")
 ### pattern of systematic genes
-ptnSys <- "Y[A-P][L,R][0-9]{3}[W,C]"
+ptnSys <- "Y[A-P][L,R][0-9]{3}[W,C](-[A-Z])?"
 ### pattern of random id genes
 ptnRid <- "_G[0-9]{7}"
 ### skipped columns
