@@ -82,8 +82,8 @@ CountAnyFeat <- function(x) {
 #'
 #' This function counts the number of occurrences of systematic gene features 
 #' in a character vector based on a predefined regular expression pattern.
-#' The pattern follows the format: `Y[A-P][L,R][0-9]{3}[W,C]`, 
-#' which is commonly used for systematic yeast gene names.
+#' The pattern follows the format: `Y[A-P][L,R][0-9]{3}[W,C](-[A-Z])?`, 
+#' which is used for systematic yeast gene names.
 #'
 #' @param x A character vector where each element 
 #'          may contain systematic gene names.
