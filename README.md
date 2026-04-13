@@ -36,7 +36,7 @@ Rscript -e 'install.packages(c(
 
 - check `impg` version compatibility
 
-## Repository Layout
+## Repository layout
 
 Top-level directories:
 
@@ -109,7 +109,7 @@ The notebook notes an `impg` version difference:
 
 Adjust the command in mrk/c3.R or the matching chunk in mrk/panda.Rmd to match the installed version.
 
-## Running an Analysis
+## Running an analysis
 
 There is no executable or standalone CLI entrypoint; the repository is driven from the notebook or by running a single chunk, as described below.
 
@@ -148,7 +148,7 @@ Rscript mrk/run-profvis.R c3.R
 
 Run that command from `mrk/` if you want `run-profvis.R` to resolve the target script as written.
 
-## Main Outputs
+## Main outputs
 
 Primary outputs are written to `png/`:
 
