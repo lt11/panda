@@ -4,17 +4,17 @@
 ### and determines whether graph-based feature propagation recovered homologous 
 ### coordinates in additional strains. It dynamically identifies the relevant 
 ### columns from the header, counts non-empty strain columns for each 
-### original private gene, and reports how many remain private or become 
-### shared accessory genes, together with their percentages.
+### original private gene, and reports how many remain private, become 
+### shared accessory genes or near core, together with their percentages.
 
-file="sts-by-genomes.txt"
+file="../sts/gene/sts-by-genomes.txt"
 
 awk -F '\t' '
 BEGIN {
     OFS = "\t"
 }
 
-### identify columns from the header
+### identify relevant columns
 NR == 1 {
     for (i = 1; i <= NF; i++) {
         if ($i == "Class_id")
@@ -23,12 +23,11 @@ NR == 1 {
         if ($i == "Features_id")
             featCol = i
 
-        /*
-         * The column immediately before F_pres is Ν_pres,
-         * and the preceding column is the last strain.
-         */
+        if ($i == "Ν_pres")
+            nPresCol = i
+
         if ($i == "F_pres")
-            lastStrainCol = i - 2
+            fPresCol = i
     }
 
     next
@@ -40,26 +39,30 @@ $classCol == "gene" {
     ### count the original annotation labels
     nLabels = split($featCol, labels, ",")
 
-    ### keep only genes originally classified as private
+    ### keep only genes originally classified as singletons
     if (nLabels != 1)
         next
 
     originalSingletons++
 
-    ### count strains with at least one propagated coordinate
-    nStrains = 0
+    nPres = $nPresCol + 0
+    fPres = $fPresCol + 0
 
-    for (i = featCol + 1; i <= lastStrainCol; i++) {
-        if ($i != "")
-            nStrains++
-    }
-
-    if (nStrains == 1)
-        remainingSingletons++
-    else if (nStrains >= 2)
-        sharedAccessory++
-    else
+    if (nPres == 0) {
+    	### sanity check, this should be always 0
         noCoordinates++
+    }
+    else if (nPres == 1) {
+        remainingSingletons++
+    }
+    else {
+        recoveredSingletons++
+
+        if (fPres > 0.976)
+            core++
+        else
+            sharedAccessory++
+    }
 }
 
 END {
@@ -71,6 +74,12 @@ END {
     print "remain_singletons",
           remainingSingletons + 0
 
+    print "recovered_singletons",
+          recoveredSingletons + 0
+
+    print "core",
+          core + 0
+
     print "shared_accessory",
           sharedAccessory + 0
 
@@ -81,8 +90,22 @@ END {
         printf "remain_singletons_pct\t%.2f\n",
                100 * remainingSingletons / originalSingletons
 
+        printf "recovered_singletons_pct\t%.2f\n",
+               100 * recoveredSingletons / originalSingletons
+
+        printf "core_pct\t%.2f\n",
+               100 * core / originalSingletons
+
         printf "shared_accessory_pct\t%.2f\n",
                100 * sharedAccessory / originalSingletons
+    }
+
+    if (recoveredSingletons > 0) {
+        printf "core_among_recovered_pct\t%.2f\n",
+               100 * core / recoveredSingletons
+
+        printf "shared_accessory_among_recovered_pct\t%.2f\n",
+               100 * sharedAccessory / recoveredSingletons
     }
 }
 ' "$file"
