@@ -93,6 +93,7 @@ $classCol == "gene" {
 
             size = (pos[2] + 0) - (pos[1] + 0)
             recoveredRidIntervals++
+            sizes[recoveredRidIntervals] = size
             totalSize += size
 
             if (recoveredRidIntervals == 1 ||
@@ -115,7 +116,26 @@ END {
           "", "", "" > "/dev/stderr"
 
     if (recoveredRidIntervals > 0) {
+        for (i = 1; i <= recoveredRidIntervals; i++) {
+            for (j = i + 1; j <= recoveredRidIntervals; j++) {
+                if (sizes[j] < sizes[i]) {
+                    tmp = sizes[i]
+                    sizes[i] = sizes[j]
+                    sizes[j] = tmp
+                }
+            }
+        }
+
+        if (recoveredRidIntervals % 2 == 1) {
+            medianSize = sizes[(recoveredRidIntervals + 1) / 2]
+        } else {
+            mid = recoveredRidIntervals / 2
+            medianSize = (sizes[mid] + sizes[mid + 1]) / 2
+        }
+
         printf "summary\tmin_size\t%d\t\t\t\n", minSize > "/dev/stderr"
+        printf "summary\tmedian_size\t%.2f\t\t\t\n",
+               medianSize > "/dev/stderr"
         printf "summary\tmean_size\t%.2f\t\t\t\n",
                totalSize / recoveredRidIntervals > "/dev/stderr"
         printf "summary\tmax_size\t%d\t\t\t\n", maxSize > "/dev/stderr"
