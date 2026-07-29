@@ -1,9 +1,10 @@
 #!/usr/bin/env bash
 
 ### The script identifies gene sub-blocks that have a single random-id feature
-### label but propagated coordinates in more than one genome. These are not
-### "original singletons" in a pre-panda sense. They are post-panda rows where a
-### lone random-id label marks a sequence now found in multiple genomes.
+### label. These are not "original singletons" in a pre-panda sense. They are
+### post-panda rows where a lone random-id label marks a private-gene candidate.
+### The script counts both rows that stayed private (Ν_pres == 1) and rows that
+### were propagated to other genomes (Ν_pres > 1).
 ###
 ### For each matching row, the script extracts every propagated interval and its
 ### length. For example, AAB#0#chrXVI:207883-209683 has length 1800.
@@ -63,16 +64,23 @@ NR == 1 {
 ### consider only gene rows
 $classCol == "gene" {
 
-    ### keep rows with a single random-id feature label and propagated
-    ### coordinates in more than one genome
+    ### keep rows with a single random-id feature label
     if (($nFeatsCol + 0) != 1 ||
-        ($nFeatsRidCol + 0) != 1 ||
-        ($nPresCol + 0) <= 1)
+        ($nFeatsRidCol + 0) != 1)
         next
 
-    recoveredRidRows++
     nPres = $nPresCol + 0
     fPres = $fPresCol + 0
+
+    if (nPres == 1) {
+        privateGenesWithoutHomologs++
+        next
+    }
+
+    if (nPres <= 1)
+        next
+
+    propagatedPrivateGenes++
 
     for (g = 1; g <= nGenomeCols; g++) {
         col = genomeCols[g]
@@ -122,10 +130,12 @@ $classCol == "gene" {
 }
 
 END {
-    print "summary", "candidate_rows", recoveredRidRows + 0,
-          "", "", "" > "/dev/stderr"
-    print "summary", "candidate_intervals", recoveredRidIntervals + 0,
-          "", "", "" > "/dev/stderr"
+    print "summary", "propagated_private_genes",
+          propagatedPrivateGenes + 0, "", "", "" > "/dev/stderr"
+    print "summary", "private_genes_without_homologs",
+          privateGenesWithoutHomologs + 0, "", "", "" > "/dev/stderr"
+    print "summary", "propagated_private_gene_intervals",
+          recoveredRidIntervals + 0, "", "", "" > "/dev/stderr"
     print "summary", "malformed_intervals", malformedIntervals + 0,
           "", "", "" > "/dev/stderr"
     if (malformedIntervals > warningLimit) {
