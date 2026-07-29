@@ -10,10 +10,13 @@
 
 script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 file="${script_dir}/../sts/gene/sts-by-genomes.txt"
+sizes_file="$(mktemp)"
+trap 'rm -f "${sizes_file}"' EXIT
 
-awk -F '\t' '
+awk -F '\t' -v sizes_file="${sizes_file}" '
 BEGIN {
     OFS = "\t"
+    warningLimit = 20
 }
 
 ### identify relevant columns
@@ -85,6 +88,15 @@ $classCol == "gene" {
             if (intervalId == "")
                 continue
 
+            if (intervalId !~ /^[^#]+#[0-9]+#[^:]+:[0-9]+-[0-9]+$/) {
+                malformedIntervals++
+                if (malformedIntervals <= warningLimit) {
+                    print "warning", "malformed_interval", $featCol,
+                          genomeNames[col], intervalId > "/dev/stderr"
+                }
+                continue
+            }
+
             coord = intervalId
             sub(/^.*:/, "", coord)
 
@@ -93,7 +105,7 @@ $classCol == "gene" {
 
             size = (pos[2] + 0) - (pos[1] + 0)
             recoveredRidIntervals++
-            sizes[recoveredRidIntervals] = size
+            print size >> sizes_file
             totalSize += size
 
             if (recoveredRidIntervals == 1 ||
@@ -114,31 +126,40 @@ END {
           "", "", "" > "/dev/stderr"
     print "summary", "candidate_intervals", recoveredRidIntervals + 0,
           "", "", "" > "/dev/stderr"
+    print "summary", "malformed_intervals", malformedIntervals + 0,
+          "", "", "" > "/dev/stderr"
+    if (malformedIntervals > warningLimit) {
+        print "summary", "malformed_interval_warnings_omitted",
+              malformedIntervals - warningLimit, "", "", "" > "/dev/stderr"
+    }
 
     if (recoveredRidIntervals > 0) {
-        for (i = 1; i <= recoveredRidIntervals; i++) {
-            for (j = i + 1; j <= recoveredRidIntervals; j++) {
-                if (sizes[j] < sizes[i]) {
-                    tmp = sizes[i]
-                    sizes[i] = sizes[j]
-                    sizes[j] = tmp
-                }
-            }
-        }
-
-        if (recoveredRidIntervals % 2 == 1) {
-            medianSize = sizes[(recoveredRidIntervals + 1) / 2]
-        } else {
-            mid = recoveredRidIntervals / 2
-            medianSize = (sizes[mid] + sizes[mid + 1]) / 2
-        }
-
         printf "summary\tmin_size\t%d\t\t\t\n", minSize > "/dev/stderr"
-        printf "summary\tmedian_size\t%.2f\t\t\t\n",
-               medianSize > "/dev/stderr"
         printf "summary\tmean_size\t%.2f\t\t\t\n",
                totalSize / recoveredRidIntervals > "/dev/stderr"
         printf "summary\tmax_size\t%d\t\t\t\n", maxSize > "/dev/stderr"
     }
 }
 ' "$file"
+
+if [[ -s "${sizes_file}" ]]; then
+    sort -n "${sizes_file}" |
+    awk '
+    {
+        sizes[NR] = $1
+    }
+
+    END {
+        if (NR == 0)
+            exit
+
+        if (NR % 2 == 1) {
+            median = sizes[(NR + 1) / 2]
+        } else {
+            mid = NR / 2
+            median = (sizes[mid] + sizes[mid + 1]) / 2
+        }
+
+        printf "summary\tmedian_size\t%.2f\t\t\t\n", median > "/dev/stderr"
+    }'
+fi
