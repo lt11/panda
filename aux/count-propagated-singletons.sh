@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 
 ### The script identifies gene sub-blocks that have a single random-id feature
-### label. These are not "original singletons" in a pre-panda sense. They are
+### label (combining N_feats and N_feats_rid). 
+### These are not "original singletons" in a pre-panda sense. They are
 ### post-panda rows where a lone random-id label marks a private-gene candidate.
 ### The script counts both rows that stayed private (Ν_pres == 1) and rows that
 ### were propagated to other genomes (Ν_pres > 1).
